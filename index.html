@@ -4,69 +4,324 @@
     <meta charset="UTF-8">
     <title>PD-Simulator: Lijnbaansgracht 12</title>
     <style>
-        :root { --police-blue: #00529b; --gold: #d4af37; --error: #e74c3c; }
-        body { font-family: 'Arial', sans-serif; margin: 0; background: #1a1a1a; color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        :root { --police-blue: #00529b; --gold: #d4af37; --error: #e74c3c; --success: #2ecc71; }
+        body { 
+            font-family: 'Arial', sans-serif; 
+            margin: 0; 
+            background: #1a1a1a; 
+            color: white; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+        }
         
-        /* Pagina's */
         .page { display: none; flex: 1; }
         .active { display: flex; }
 
-        /* Login */
-        #page-login { align-items: center; justify-content: center; flex-direction: column; background: radial-gradient(circle, #00529b, #002d54); }
-        .login-card { background: white; padding: 30px; border-radius: 8px; color: #333; text-align: center; width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        input[type="text"] { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
-        .btn-login { background: var(--police-blue); color: white; border: none; padding: 14px; width: 100%; margin-top: 10px; cursor: pointer; font-weight: bold; border-radius: 4px; }
+        #page-login { 
+            align-items: center; 
+            justify-content: center; 
+            flex-direction: column; 
+            background: radial-gradient(circle, #00529b, #002d54); 
+        }
+        .login-card { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 8px; 
+            color: #333; 
+            text-align: center; 
+            width: 350px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); 
+        }
+        input[type="text"] { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 10px 0; 
+            border: 2px solid #ccc; 
+            border-radius: 4px; 
+            box-sizing: border-box; 
+            font-size: 16px; 
+        }
+        .btn { 
+            background: var(--police-blue); 
+            color: white; 
+            border: none; 
+            padding: 14px; 
+            width: 100%; 
+            margin-top: 5px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            border-radius: 4px; 
+            transition: all 0.3s; 
+        }
+        .btn:hover { background: #003d73; }
+        .btn-unit { background: #555; }
 
-        /* Hoofd Layout */
         .main-layout { display: flex; flex: 1; width: 100%; }
-        .canvas-area { flex: 2; position: relative; border-right: 2px solid #444; background-color: #222; background-size: contain; background-repeat: no-repeat; background-position: center; }
-        .sidebar { flex: 1; background: #f4f4f4; color: #333; display: flex; flex-direction: column; }
+        .canvas-area { 
+            flex: 2; 
+            position: relative; 
+            border-right: 2px solid #444; 
+            background-color: #222; 
+            background-size: cover; 
+            background-repeat: no-repeat; 
+            background-position: center; 
+            overflow: hidden; 
+        }
+        .sidebar { flex: 1; background: #f4f4f4; color: #333; display: flex; flex-direction: column; min-width: 300px; }
 
-        /* Stickers */
-        .element { position: absolute; cursor: move; display: flex; flex-direction: column; align-items: center; z-index: 100; transform: translate(-50%, -50%); }
-        .element img { filter: drop-shadow(2px 4px 5px rgba(0,0,0,0.8)); pointer-events: none; }
-        .label { font-size: 10px; background: rgba(0,0,0,0.8); color: white; padding: 2px 4px; border-radius: 3px; margin-top: 2px; white-space: nowrap; }
+        .header-bar { 
+            background: var(--police-blue); 
+            color: white; 
+            padding: 10px 15px; 
+            font-size: 12px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 2px solid var(--gold); 
+        }
+        .header-info { display: flex; gap: 20px; }
+        .status-dot { 
+            width: 10px; 
+            height: 10px; 
+            border-radius: 50%; 
+            display: inline-block; 
+            margin-right: 5px; 
+        }
+        .online { background: var(--success); }
+        .offline { background: var(--error); }
 
-        /* Feed */
-        #livefeed { flex: 1; overflow-y: auto; padding: 15px; background: #e9ecef; }
-        .melding { background: white; border-left: 5px solid var(--police-blue); margin-bottom: 10px; padding: 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .fb-badge { display: inline-block; background: var(--error); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-top: 5px; font-weight: bold; }
+        .spoor { 
+            position: absolute; 
+            cursor: move; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            z-index: 100; 
+            transform: translate(-50%, -50%); 
+            transition: all 0.3s; 
+        }
+        .spoor:hover { transform: translate(-50%, -50%) scale(1.1); z-index: 1000; }
+        .spoor img { 
+            filter: drop-shadow(2px 4px 5px rgba(0,0,0,0.8)); 
+            pointer-events: none; 
+        }
+        .spoor-label { 
+            font-size: 11px; 
+            background: rgba(0,0,0,0.85); 
+            color: white; 
+            padding: 3px 8px; 
+            border-radius: 4px; 
+            margin-top: 4px; 
+            white-space: nowrap; 
+            font-weight: bold; 
+            border: 1px solid rgba(255,255,255,0.2); 
+        }
+        .spoor-selected { 
+            outline: 3px solid var(--gold); 
+            border-radius: 8px; 
+        }
+        .spoor-crime { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+
+        #livefeed { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 15px; 
+            background: #e9ecef; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        .melding { 
+            background: white; 
+            border-left: 5px solid var(--police-blue); 
+            margin-bottom: 10px; 
+            padding: 12px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            cursor: pointer; 
+            transition: all 0.2s; 
+        }
+        .melding:hover { transform: translateX(3px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .melding-active { background: #e3f2fd; border-left-color: var(--gold); }
+        .melding-oc { border-left-color: var(--success); }
+        .fb-badge { 
+            display: inline-block; 
+            background: var(--error); 
+            color: white; 
+            padding: 3px 8px; 
+            border-radius: 4px; 
+            font-size: 10px; 
+            margin-top: 5px; 
+            font-weight: bold; 
+            margin-right: 5px; 
+        }
+        .fb-good { background: var(--success); }
+
+        .controls { 
+            padding: 15px; 
+            background: white; 
+            border-top: 1px solid #ccc; 
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1); 
+        }
+        textarea { 
+            width: 100%; 
+            height: 70px; 
+            padding: 10px; 
+            border: 2px solid #ccc; 
+            border-radius: 4px; 
+            box-sizing: border-box; 
+            resize: none; 
+            font-family: 'Arial', sans-serif; 
+        }
         
-        .controls { padding: 15px; background: white; border-top: 1px solid #ccc; }
-        textarea { width: 100%; height: 70px; padding: 10px; border: 2px solid #ccc; border-radius: 4px; box-sizing: border-box; resize: none; }
+        .sporen-toolbar { 
+            position: absolute; 
+            top: 10px; 
+            left: 10px; 
+            background: rgba(0,0,0,0.7); 
+            padding: 10px; 
+            border-radius: 8px; 
+            z-index: 1000; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+        }
+        .spoor-btn { 
+            background: rgba(255,255,255,0.9); 
+            border: none; 
+            padding: 8px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            font-size: 12px; 
+            transition: all 0.2s; 
+        }
+        .spoor-btn:hover { background: white; transform: translateX(3px); }
+        .spoor-btn img { width: 24px; height: 24px; }
+
+        .zoom-controls { 
+            position: absolute; 
+            bottom: 10px; 
+            right: 10px; 
+            background: rgba(0,0,0,0.7); 
+            padding: 10px; 
+            border-radius: 8px; 
+            z-index: 1000; 
+        }
+        .zoom-btn { 
+            background: rgba(255,255,255,0.9); 
+            border: none; 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            font-size: 18px; 
+            margin: 5px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+
+        .selected-info { 
+            position: absolute; 
+            bottom: 10px; 
+            left: 10px; 
+            background: rgba(0,0,0,0.85); 
+            color: white; 
+            padding: 15px; 
+            border-radius: 8px; 
+            z-index: 1000; 
+            max-width: 300px; 
+            border: 2px solid var(--gold); 
+            display: none; 
+        }
+        
+        /* Echte foto container */
+        .foto-container {
+            width: 100%;
+            height: 100%;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
     </style>
 </head>
 <body>
 
 <div id="page-login" class="page active">
     <div class="login-card">
-        <h3>PD Simulator v2.6</h3>
-        <input type="text" id="userName" placeholder="Vul je voornaam in...">
-        <button class="btn-login" onclick="startApp('OC')">Login als OC</button>
-        <button class="btn-login" onclick="startApp('UNIT')" style="background:#555;">Login als Eenheid</button>
+        <h2>🔍 PD Simulator v3.0</h2>
+        <p style="color:#666; font-size:14px;">Jouw Realistische PD Training</p>
+        <input type="text" id="userName" placeholder="Vul je voornaam in..." autocomplete="off">
+        <button class="btn" onclick="startApp('OC')">📡 Login als Operationeel Centrum</button>
+        <button class="btn btn-unit" onclick="startApp('UNIT')">🚔 Login als Eenheid</button>
+        <div style="margin-top:15px; font-size:12px; color:#777; text-align:left; background:#f5f5f5; padding:10px; border-radius:4px;">
+            <strong>Training Scenario:</strong> Schietincident Lijnbaansgracht 12<br>
+            <strong>Datum:</strong> <span id="current-date"></span><br>
+            <strong>Database:</strong> <span id="db-status">✅ Verbonden</span>
+        </div>
     </div>
 </div>
 
 <div id="page-sim" class="page">
+    <div class="header-bar">
+        <div><strong>PD SIMULATOR</strong> | Lijnbaansgracht 12 | <span id="current-time"></span></div>
+        <div class="header-info">
+            <span id="display-name"></span>
+            <span>|</span>
+            <span id="display-role"></span>
+            <span>|</span>
+            <span><span class="status-dot online"></span> <span id="online-count">1</span> online</span>
+            <span>| DB: <span id="realtime-status">🟢 Live</span></span>
+        </div>
+    </div>
+    
     <div class="main-layout">
-        <div id="canvas" class="canvas-area"></div>
-        <div class="sidebar">
-            <div style="padding:10px; background:var(--police-blue); color:white; font-size:11px;">
-                NAAM: <span id="display-name"></span> | ROL: <span id="display-role"></span>
+        <div id="canvas" class="canvas-area">
+            <div id="foto-container" class="foto-container"></div>
+            
+            <div id="sporen-toolbar" class="sporen-toolbar" style="display:none;">
+                <strong style="color:white; margin-bottom:5px;">📌 Plaats sporen:</strong>
             </div>
+            
+            <div id="selected-info" class="selected-info">
+                <strong id="selected-title"></strong><br>
+                <span id="selected-desc"></span><br>
+                <small id="selected-pos"></small>
+            </div>
+            
+            <div class="zoom-controls">
+                <button class="zoom-btn" onclick="zoomIn()">+</button><br>
+                <button class="zoom-btn" onclick="zoomOut()">-</button><br>
+                <button class="zoom-btn" onclick="resetZoom()">↺</button>
+            </div>
+        </div>
+        
+        <div class="sidebar">
             <div id="livefeed"></div>
             <div class="controls">
                 <div id="unit-area">
-                    <textarea id="msgInput" placeholder="Paradigma: Ik bevond mij..."></textarea>
-                    <button class="btn-login" onclick="sendMsg()">MELDEN</button>
+                    <textarea id="msgInput" placeholder="Geef je observatie door volgens paradigma..."></textarea>
+                    <button class="btn" onclick="sendMsg()">📡 MELDEN NAAR OC</button>
                 </div>
-                <div id="oc-area" style="display:none; font-size:13px;">
-                    <strong>Paradigma Feedback:</strong><br>
-                    <label><input type="checkbox" class="fb-opt" value="Tijdsvorm Fout"> 1. Tijdsvorm (was/is)</label><br>
-                    <label><input type="checkbox" class="fb-opt" value="Trechter Fout"> 2. Trechter (L->R)</label><br>
-                    <label><input type="checkbox" class="fb-opt" value="Onderwerp Fout"> 3. Onderwerp = Object</label><br>
-                    <label><input type="checkbox" class="fb-opt" value="Positie Fout"> 4. Positie Verbalisant (Ik)</label>
-                    <p style="color:gray; font-size:10px;">Vink aan en klik op een melding hierboven.</p>
+                <div id="oc-area" style="display:none;">
+                    <strong>🎯 Paradigma Feedback:</strong><br>
+                    <div style="display:flex; flex-wrap:wrap; gap:8px; margin:10px 0;">
+                        <label><input type="checkbox" class="fb-opt" value="Tijdsvorm Fout"> 1. Tijdsvorm</label>
+                        <label><input type="checkbox" class="fb-opt" value="Trechter Fout"> 2. Trechter</label>
+                        <label><input type="checkbox" class="fb-opt" value="Onderwerp Fout"> 3. Onderwerp</label>
+                        <label><input type="checkbox" class="fb-opt" value="Positie Fout"> 4. Positie</label>
+                        <label><input type="checkbox" class="fb-opt" value="GOED"> ✓ Goed</label>
+                    </div>
+                    <div style="font-size:11px; color:#666;">
+                        <strong>Database Info:</strong><br>
+                        • Path: <code id="db-path">decoroefening-default-rtdb</code><br>
+                        • Gebruikers online: <span id="db-users">1</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -75,18 +330,9 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js";
-    import { getDatabase, ref, onValue, set, push, update } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-database.js";
+    import { getDatabase, ref, onValue, set, push, update, onDisconnect, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-database.js";
 
-    // CONFIGURATIE - PAS HIER DE NAMEN AAN INDIEN NODIG
-    const DECOR_CONFIG = {
-        oc: 'plattegrond.png',
-        units: [
-            'Q2les4PVAangiftedecor.png',
-            'Q2les4PVAangiftedecor_2.png',
-            'Q2les4PVAangiftedecor_3.png'
-        ]
-    };
-
+    // JOUW FIREBASE CONFIG - PAS AAN INDIEN NODIG
     const firebaseConfig = {
         apiKey: "AIzaSyB12mTMBnuxdC4W4htyFO_C7Dnh3maVKew",
         authDomain: "decoroefening.firebaseapp.com",
@@ -97,87 +343,353 @@
         appId: "1:945998495824:web:a76dc7519b3b262a021155"
     };
 
+    // Initialiseer Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    let myName, myRole;
-
-    const items = [
-        { id: 'container', name: 'Container', img: 'https://img.icons8.com/color/96/dumpster.png', size: 90 },
-        { id: 'wapen', name: 'Pistool', img: 'https://img.icons8.com/color/96/handgun.png', size: 60 },
-        { id: 'huls', name: 'Koperen huls', img: 'https://img.icons8.com/color/96/bullet.png', size: 30 },
-        { id: 'schoen', name: 'Voetafdruk', img: 'https://img.icons8.com/ios-filled/100/footprint.png', size: 50 },
-        { id: 'b1', name: 'Bordje 1', img: 'https://img.icons8.com/color/96/1-circle.png', size: 40 }
+    
+    // Database referenties
+    const positionsRef = ref(db, 'positions');
+    const feedRef = ref(db, 'feed');
+    const usersRef = ref(db, 'users');
+    const configRef = ref(db, 'config');
+    
+    // Globale variabelen
+    let myName, myRole, myUserId;
+    let canvas, selectedSpoor = null;
+    let zoomLevel = 1;
+    let currentBackground = '';
+    
+    // Sporen database
+    const sporen = [
+        { id: 'pistool', name: '9mm Pistool', img: '🔫', size: 60, desc: 'Glock 17, serie nr. onleesbaar' },
+        { id: 'huls', name: 'Koperen huls', img: '🔘', size: 40, desc: '9mm patroon, 3m van slachtoffer' },
+        { id: 'bloedspoor', name: 'Bloedspoor', img: '🩸', size: 50, desc: 'Druppelvormig, richting west' },
+        { id: 'schoen', name: 'Schoenafdruk', img: '👟', size: 45, desc: 'Nike Air Max, maat 43' },
+        { id: 'container', name: 'Vuilcontainer', img: '🗑️', size: 70, desc: 'Metalen container' },
+        { id: 'mes', name: 'Steekwapen', img: '🔪', size: 50, desc: 'Switchblade mes' },
+        { id: 'telefoon', name: 'Mobiele telefoon', img: '📱', size: 40, desc: 'iPhone 12, scherm gebroken' },
+        { id: 'jas', name: 'Kapotte jas', img: '🧥', size: 55, desc: 'Zwarte hoodie, scheur links' },
+        { id: 'auto', name: 'Remspoor', img: '🚗', size: 60, desc: '8m lang, richting noord' },
+        { id: 'getuige', name: 'Getuigenpunt', img: '👤', size: 40, desc: 'Positie meldende getuige' }
     ];
-
-    window.startApp = (role) => {
-        myName = document.getElementById('userName').value || "Agent";
+    
+    // Foto URL's - VERVANG DIT MET JOUW EIGEN FOTO'S
+    const fotoConfig = {
+        oc: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80',
+        units: [
+            'https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80',
+            'https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80',
+            'https://images.unsplash.com/photo-1519501025264-65ba15a82390?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80',
+            'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80'
+        ]
+    };
+    
+    // Initialisatie
+    document.addEventListener('DOMContentLoaded', () => {
+        // Toon huidige datum
+        const now = new Date();
+        document.getElementById('current-date').textContent = now.toLocaleDateString('nl-NL', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        // Update tijd elke seconde
+        setInterval(() => {
+            const time = new Date().toLocaleTimeString('nl-NL');
+            document.getElementById('current-time').textContent = time;
+        }, 1000);
+        
+        // Check database connectie
+        checkDatabaseConnection();
+    });
+    
+    async function checkDatabaseConnection() {
+        try {
+            const snapshot = await get(ref(db, '.info/connected'));
+            const connected = snapshot.val();
+            document.getElementById('db-status').textContent = connected ? '✅ Verbonden' : '❌ Niet verbonden';
+            document.getElementById('realtime-status').textContent = connected ? '🟢 Live' : '🔴 Offline';
+        } catch (error) {
+            console.error('Database error:', error);
+            document.getElementById('db-status').textContent = '❌ Fout: ' + error.message;
+        }
+    }
+    
+    window.startApp = async (role) => {
+        myName = document.getElementById('userName').value.trim() || "Agent_" + Math.floor(Math.random() * 1000);
         myRole = role;
+        myUserId = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        
+        // Update UI
         document.getElementById('page-login').classList.remove('active');
         document.getElementById('page-sim').classList.add('active');
         document.getElementById('display-name').innerText = myName;
-        document.getElementById('display-role').innerText = role;
-
-        const canvas = document.getElementById('canvas');
+        document.getElementById('display-role').innerText = role === 'OC' ? 'Operationeel Centrum' : 'Eenheid';
+        document.getElementById('db-path').textContent = firebaseConfig.databaseURL.split('/').pop();
+        
+        // Registreer gebruiker in Firebase
+        await set(ref(db, 'users/' + myUserId), {
+            name: myName,
+            role: role,
+            online: true,
+            lastActive: serverTimestamp(),
+            joined: new Date().toISOString()
+        });
+        
+        // Cleanup bij disconnect
+        onDisconnect(ref(db, 'users/' + myUserId)).update({ online: false });
+        
+        // Setup canvas
+        canvas = document.getElementById('canvas');
+        const fotoContainer = document.getElementById('foto-container');
+        
         if(role === 'OC') {
-            canvas.style.backgroundImage = `url('${DECOR_CONFIG.oc}')`;
+            // OC krijgt overzichtsbeeld
+            currentBackground = fotoConfig.oc;
+            fotoContainer.style.backgroundImage = `url('${currentBackground}')`;
             document.getElementById('oc-area').style.display = 'block';
             document.getElementById('unit-area').style.display = 'none';
+            
+            // Toon sporen toolbar
+            const toolbar = document.getElementById('sporen-toolbar');
+            toolbar.style.display = 'flex';
+            toolbar.innerHTML = '<strong style="color:white; margin-bottom:5px;">📌 Plaats sporen:</strong>';
+            
+            sporen.forEach(spoor => {
+                const btn = document.createElement('button');
+                btn.className = 'spoor-btn';
+                btn.innerHTML = `<span style="font-size:20px;">${spoor.img}</span> ${spoor.name}`;
+                btn.onclick = () => plaatsSpoor(spoor);
+                toolbar.appendChild(btn);
+            });
+            
+            // Laad bestaande sporen
+            loadSporen(true);
+            
         } else {
-            const randomImg = DECOR_CONFIG.units[Math.floor(Math.random() * DECOR_CONFIG.units.length)];
-            canvas.style.backgroundImage = `url('${randomImg}')`;
+            // Eenheid krijgt random perspectief
+            const randomFoto = fotoConfig.units[Math.floor(Math.random() * fotoConfig.units.length)];
+            currentBackground = randomFoto;
+            fotoContainer.style.backgroundImage = `url('${currentBackground}')`;
+            document.getElementById('sporen-toolbar').style.display = 'none';
+            
+            // Laad sporen (alleen lezen)
+            loadSporen(false);
         }
-
-        items.forEach(item => {
-            const el = document.createElement('div');
-            el.className = 'element';
-            el.style.width = item.size + 'px';
-            el.innerHTML = `<img src="${item.img}" style="width:100%"><div class="label">${item.name}</div>`;
-            canvas.appendChild(el);
-
-            if(role === 'OC') {
-                el.onmousedown = (e) => {
-                    document.onmousemove = (ev) => {
-                        const r = canvas.getBoundingClientRect();
-                        set(ref(db, 'positions/' + item.id), { 
-                            x: ((ev.clientX - r.left) / r.width) * 100, 
-                            y: ((ev.clientY - r.top) / r.height) * 100 
-                        });
-                    };
-                    document.onmouseup = () => document.onmousemove = null;
-                };
-            }
-            onValue(ref(db, 'positions/' + item.id), (s) => {
-                const p = s.val();
-                if(p) { el.style.left = p.x + '%'; el.style.top = p.y + '%'; }
+        
+        // Setup live feed
+        setupLiveFeed();
+        
+        // Track online users
+        trackOnlineUsers();
+    };
+    
+    function loadSporen(canEdit) {
+        onValue(positionsRef, (snapshot) => {
+            const positions = snapshot.val() || {};
+            
+            sporen.forEach(spoor => {
+                let el = document.getElementById('spoor-' + spoor.id);
+                
+                if(!el && positions[spoor.id]) {
+                    el = document.createElement('div');
+                    el.id = 'spoor-' + spoor.id;
+                    el.className = 'spoor spoor-crime';
+                    el.innerHTML = `<div style="font-size:${spoor.size}px;">${spoor.img}</div><div class="spoor-label">${spoor.name}</div>`;
+                    canvas.appendChild(el);
+                    
+                    if(canEdit) {
+                        // OC kan slepen
+                        el.onmousedown = (e) => startDrag(spoor.id, e);
+                        el.onclick = (e) => {
+                            e.stopPropagation();
+                            selectSpoor(spoor);
+                        };
+                    } else {
+                        // Eenheden kunnen alleen info zien
+                        el.onclick = (e) => {
+                            e.stopPropagation();
+                            showSpoorInfo(spoor, positions[spoor.id]);
+                        };
+                    }
+                }
+                
+                if(el && positions[spoor.id]) {
+                    el.style.left = positions[spoor.id].x + '%';
+                    el.style.top = positions[spoor.id].y + '%';
+                }
             });
         });
-    };
-
+    }
+    
+    function plaatsSpoor(spoor) {
+        if(myRole !== 'OC') return;
+        
+        const pos = { x: 30 + Math.random() * 40, y: 30 + Math.random() * 40 };
+        
+        set(ref(db, 'positions/' + spoor.id), pos).then(() => {
+            console.log(`Spoor geplaatst: ${spoor.name}`);
+        });
+    }
+    
+    function startDrag(spoorId, e) {
+        if(myRole !== 'OC') return;
+        
+        e.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        
+        const mouseMoveHandler = (ev) => {
+            const x = ((ev.clientX - rect.left) / rect.width) * 100;
+            const y = ((ev.clientY - rect.top) / rect.height) * 100;
+            
+            update(ref(db, 'positions/' + spoorId), { 
+                x: Math.max(0, Math.min(100, x)), 
+                y: Math.max(0, Math.min(100, y)) 
+            });
+        };
+        
+        const mouseUpHandler = () => {
+            document.removeEventListener('mousemove', mouseMoveHandler);
+            document.removeEventListener('mouseup', mouseUpHandler);
+        };
+        
+        document.addEventListener('mousemove', mouseMoveHandler);
+        document.addEventListener('mouseup', mouseUpHandler);
+    }
+    
+    function selectSpoor(spoor) {
+        if(selectedSpoor) {
+            document.getElementById('spoor-' + selectedSpoor.id)?.classList.remove('spoor-selected');
+        }
+        
+        selectedSpoor = spoor;
+        const el = document.getElementById('spoor-' + spoor.id);
+        if(el) el.classList.add('spoor-selected');
+        
+        const info = document.getElementById('selected-info');
+        info.style.display = 'block';
+        document.getElementById('selected-title').innerText = spoor.name;
+        document.getElementById('selected-desc').innerText = spoor.desc;
+        
+        onValue(ref(db, 'positions/' + spoor.id), (snapshot) => {
+            const pos = snapshot.val();
+            if(pos) {
+                document.getElementById('selected-pos').innerText = `Positie: X:${Math.round(pos.x)}%, Y:${Math.round(pos.y)}%`;
+            }
+        });
+    }
+    
+    function showSpoorInfo(spoor, position) {
+        alert(`${spoor.name}\n\n${spoor.desc}\n\nPositie: X:${Math.round(position.x)}%, Y:${Math.round(position.y)}%`);
+    }
+    
+    function trackOnlineUsers() {
+        onValue(usersRef, (snapshot) => {
+            const users = snapshot.val() || {};
+            const onlineUsers = Object.values(users).filter(u => u.online);
+            document.getElementById('online-count').textContent = onlineUsers.length;
+            document.getElementById('db-users').textContent = onlineUsers.length;
+            
+            // Toon gebruikers in console voor debugging
+            console.log('Online users:', onlineUsers.map(u => u.name));
+        });
+    }
+    
+    function setupLiveFeed() {
+        onValue(feedRef, (snapshot) => {
+            const feed = document.getElementById('livefeed');
+            feed.innerHTML = '<div style="padding:10px; background:var(--police-blue); color:white; margin:-15px -15px 15px -15px;"><strong>📡 LIVE MELDINGEN</strong></div>';
+            
+            const messages = [];
+            snapshot.forEach(child => {
+                messages.push({ key: child.key, ...child.val() });
+            });
+            
+            messages.reverse().forEach(msg => {
+                const div = document.createElement('div');
+                div.className = 'melding' + (msg.sender === myName ? ' melding-active' : '') + (msg.role === 'OC' ? ' melding-oc' : '');
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <strong>${msg.sender}</strong>
+                        <small style="color:#666;">${formatTime(msg.timestamp)}</small>
+                    </div>
+                    <div>${msg.msg}</div>
+                `;
+                
+                if(msg.fb && msg.fb.length > 0) {
+                    msg.fb.forEach(fb => {
+                        div.innerHTML += `<span class="fb-badge ${fb === 'GOED' ? 'fb-good' : ''}">${fb === 'GOED' ? '✓ ' : '⚠️ '}${fb}</span>`;
+                    });
+                }
+                
+                if(myRole === 'OC' && msg.sender !== myName) {
+                    div.onclick = () => {
+                        document.querySelectorAll('.melding').forEach(m => m.classList.remove('melding-active'));
+                        div.classList.add('melding-active');
+                        
+                        const fbSel = Array.from(document.querySelectorAll('.fb-opt:checked')).map(cb => cb.value);
+                        update(ref(db, 'feed/' + msg.key), { fb: fbSel });
+                        
+                        document.querySelectorAll('.fb-opt').forEach(cb => cb.checked = false);
+                    };
+                }
+                
+                feed.appendChild(div);
+            });
+            
+            feed.scrollTop = 0;
+        });
+    }
+    
     window.sendMsg = () => {
         const input = document.getElementById('msgInput');
-        if(input.value) {
-            push(ref(db, 'feed'), { sender: myName, msg: input.value, fb: [] });
-            input.value = '';
+        const msg = input.value.trim();
+        
+        if(msg) {
+            push(feedRef, { 
+                sender: myName, 
+                role: myRole,
+                msg: msg, 
+                fb: [],
+                timestamp: serverTimestamp()
+            }).then(() => {
+                input.value = '';
+                console.log('Bericht verzonden naar Firebase');
+            });
         }
     };
-
-    onValue(ref(db, 'feed'), (s) => {
-        const f = document.getElementById('livefeed');
-        f.innerHTML = '<h4>PV FEED</h4>';
-        s.forEach(c => {
-            const d = c.val();
-            const div = document.createElement('div');
-            div.className = 'melding';
-            div.innerHTML = `<strong>${d.sender}:</strong> ${d.msg}`;
-            if(d.fb) d.fb.forEach(err => div.innerHTML += `<br><span class="fb-badge">⚠️ ${err}</span>`);
-            if(myRole === 'OC') div.onclick = () => {
-                const fbSel = Array.from(document.querySelectorAll('.fb-opt:checked')).map(cb => cb.value);
-                update(ref(db, 'feed/' + c.key), { fb: fbSel });
-            };
-            f.appendChild(div);
-        });
-        f.scrollTop = f.scrollHeight;
-    });
+    
+    window.zoomIn = () => {
+        zoomLevel = Math.min(zoomLevel * 1.2, 3);
+        canvas.style.transform = `scale(${zoomLevel})`;
+    };
+    
+    window.zoomOut = () => {
+        zoomLevel = Math.max(zoomLevel / 1.2, 0.5);
+        canvas.style.transform = `scale(${zoomLevel})`;
+    };
+    
+    window.resetZoom = () => {
+        zoomLevel = 1;
+        canvas.style.transform = 'scale(1)';
+    };
+    
+    function formatTime(timestamp) {
+        if(!timestamp) return 'Zojuist';
+        try {
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+        } catch {
+            return 'Zojuist';
+        }
+    }
+    
+    // Debug info
+    console.log('Firebase Config:', firebaseConfig);
+    console.log('Database URL:', firebaseConfig.databaseURL);
+    console.log('Project ID:', firebaseConfig.projectId);
 </script>
 </body>
 </html>
