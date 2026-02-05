@@ -2,61 +2,71 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <title>PD-Simulator: Lijnbaansgracht 12 - Multi-View</title>
+    <title>PD-Simulator: Lijnbaansgracht 12</title>
     <style>
-        :root { --police-blue: #00529b; --gold: #d4af37; --koper: #b87333; }
-        body { font-family: 'Arial', sans-serif; margin: 0; background: #1a1a1a; color: white; height: 100vh; display: flex; flex-direction: column; }
+        :root { --police-blue: #00529b; --gold: #d4af37; }
+        body { font-family: 'Arial', sans-serif; margin: 0; background: #1a1a1a; color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        /* Pagina Beheer */
-        .page { display: none; flex: 1; overflow: hidden; }
+        .page { display: none; flex: 1; }
         .active { display: flex; }
 
-        /* Blad 1: Login */
-        #page-login { align-items: center; justify-content: center; flex-direction: column; background: radial-gradient(circle, #00529b, #002d54); }
-        .login-card { background: white; padding: 40px; border-radius: 8px; color: #333; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .btn-login { background: var(--police-blue); color: white; border: none; padding: 15px 30px; margin: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; width: 250px; }
+        /* Login */
+        #page-login { align-items: center; justify-content: center; flex-direction: column; background: #002d54; }
+        .login-card { background: white; padding: 30px; border-radius: 8px; color: #333; text-align: center; width: 300px; }
+        input[type="text"] { width: 100%; padding: 10px; margin: 10px 0; border: 2px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn-login { background: var(--police-blue); color: white; border: none; padding: 12px; width: 100%; margin-top: 10px; cursor: pointer; font-weight: bold; border-radius: 4px; }
 
-        /* Layout voor OC & Eenheid */
+        /* Simulator */
         .main-layout { display: flex; flex: 1; width: 100%; }
-        .canvas-area { flex: 2; position: relative; background-color: #222; border: 2px solid #444; overflow: hidden; }
+        .canvas-area { flex: 2; position: relative; border: 2px solid #444; }
         .sidebar { flex: 1; background: #f4f4f4; color: #333; display: flex; flex-direction: column; }
-        
-        /* Specifieke Achtergronden */
-        .bg-oc { background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Blueprint_background.jpg/1200px-Blueprint_background.jpg'); background-size: cover; } /* Placeholder voor Plattegrond */
-        .bg-unit { background-image: url('Q2les4PVAangiftedecor.png'); background-size: cover; background-position: center; }
 
-        /* Stickers */
-        .element { position: absolute; cursor: move; display: flex; flex-direction: column; align-items: center; z-index: 10; }
-        .element img { filter: drop-shadow(2px 4px 5px rgba(0,0,0,0.8)); pointer-events: none; }
-        .label { font-size: 10px; background: rgba(0,0,0,0.8); color: white; padding: 2px 4px; border-radius: 3px; margin-top: 2px; }
+        /* De 4 verschillende gezichtspunten */
+        .bg-oc { background: url('plattegrond.png') center/contain no-repeat #333; } /* OC: Bovenaanzicht */
+        .bg-unit-1 { background: url('Q2les4PVAangiftedecor.png') center/cover no-repeat; } /* Perspectief 1 */
+        .bg-unit-2 { background: url('Q2les4PVAangiftedecor_links.png') center/cover no-repeat; } /* Placeholder voor 2 */
+        .bg-unit-3 { background: url('Q2les4PVAangiftedecor_rechts.png') center/cover no-repeat; } /* Placeholder voor 3 */
 
-        /* Feed & Controls */
-        #livefeed { flex: 1; overflow-y: auto; padding: 15px; background: #e9ecef; }
-        .melding { background: white; border-left: 5px solid var(--police-blue); margin-bottom: 8px; padding: 10px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 13px; }
-        .feedback-badge { background: #e74c3c; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-right: 4px; font-weight: bold; }
-        .input-area { padding: 15px; background: white; border-top: 1px solid #ccc; }
-        textarea { width: 100%; height: 60px; margin-bottom: 5px; box-sizing: border-box; }
+        .element { position: absolute; cursor: move; display: flex; flex-direction: column; align-items: center; z-index: 10; transform: translate(-50%, -50%); }
+        .element img { width: 100%; filter: drop-shadow(2px 4px 5px rgba(0,0,0,0.8)); pointer-events: none; }
+        .label { font-size: 9px; background: rgba(0,0,0,0.7); color: white; padding: 2px 4px; border-radius: 3px; margin-top: 2px; }
+
+        #livefeed { flex: 1; overflow-y: auto; padding: 15px; background: #e9ecef; border-bottom: 1px solid #ccc; }
+        .melding { background: white; border-left: 5px solid var(--police-blue); margin-bottom: 8px; padding: 10px; font-size: 13px; border-radius: 4px; }
+        .fb-badge { background: #e74c3c; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-top: 5px; display: inline-block; }
     </style>
 </head>
 <body>
 
 <div id="page-login" class="page active">
     <div class="login-card">
-        <h2>PD-Simulator LOGIN</h2>
-        <p>Selecteer uw rol binnen de oefening</p>
-        <button class="btn-login" onclick="initApp('OC')">Operationeel Centrum (OC)</button>
-        <button class="btn-login" onclick="initApp('UNIT')">Eenheid ter Plaatse</button>
+        <h3>PD Simulator Inlog</h3>
+        <input type="text" id="userName" placeholder="Uw voornaam...">
+        <button class="btn-login" onclick="startSim('OC')">Inloggen als OC</button>
+        <button class="btn-login" onclick="startSim('UNIT')" style="background:#555;">Inloggen als Eenheid</button>
     </div>
 </div>
 
 <div id="page-sim" class="page">
     <div class="main-layout">
-        <div id="canvas-container" class="canvas-area">
-            </div>
+        <div id="canvas" class="canvas-area"></div>
         <div class="sidebar">
-            <div id="livefeed"><h3>Live Feed</h3></div>
-            <div class="input-area" id="input-section">
+            <header style="padding:10px; background:var(--police-blue); color:white; font-size:12px;">
+                <span id="display-name">Naam</span> | <span id="display-role">Rol</span>
+            </header>
+            <div id="livefeed"></div>
+            <div id="controls" style="padding:15px; background:white;">
+                <div id="unit-controls">
+                    <textarea id="msgInput" style="width:100%; height:60px;" placeholder="Beschrijf decor volgens paradigma..."></textarea>
+                    <button class="btn-login" onclick="sendMsg()">Meld aan OC</button>
                 </div>
+                <div id="oc-controls" style="display:none;">
+                    <strong>Feedback Paradigma:</strong><br>
+                    <label><input type="checkbox" class="fb-opt" value="Tijdsvorm Fout"> Tijdsvorm</label><br>
+                    <label><input type="checkbox" class="fb-opt" value="Trechter Fout"> Trechter (L->R)</label>
+                    <p style="font-size:10px; color:gray;">Selecteer fout en klik op melding in de feed.</p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -77,46 +87,42 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    let myName = "";
+    let myRole = "";
 
     const items = [
-        { id: 'container', name: 'Container', img: 'https://img.icons8.com/color/150/dumpster.png', size: 80 },
-        { id: 'wapen', name: 'Vuurwapen', img: 'https://img.icons8.com/color/150/handgun.png', size: 50 },
-        { id: 'huls', name: 'Koperen huls', img: 'https://img.icons8.com/color/100/bullet.png', size: 25 },
-        { id: 'schoen', name: 'Schoenafdruk', img: 'https://img.icons8.com/external-vitaliy-gorbachev-fill-vitaly-gorbachev/100/external-footprint-detective-vitaliy-gorbachev-fill-vitaly-gorbachev.png', size: 45 },
-        { id: 'b1', name: 'Bordje 1', img: 'https://img.icons8.com/color/96/1-circle.png', size: 30 }
+        { id: 'container', name: 'Container', img: 'https://img.icons8.com/color/150/dumpster.png', size: 90 },
+        { id: 'wapen', name: 'Vuurwapen', img: 'https://img.icons8.com/color/150/handgun.png', size: 60 },
+        { id: 'huls', name: 'Koperen huls', img: 'https://img.icons8.com/color/100/bullet.png', size: 30 },
+        { id: 'schoen', name: 'Schoenafdruk', img: 'https://img.icons8.com/external-vitaliy-gorbachev-fill-vitaly-gorbachev/100/external-footprint-detective-vitaliy-gorbachev-fill-vitaly-gorbachev.png', size: 50 },
+        { id: 'b1', name: 'Bordje 1', img: 'https://img.icons8.com/color/96/1-circle.png', size: 35 }
     ];
 
-    window.initApp = (role) => {
+    window.startSim = (role) => {
+        myName = document.getElementById('userName').value || "Onbekend";
+        myRole = role;
+        if(myName === "Onbekend") return alert("Vul a.u.b. uw voornaam in.");
+
         document.getElementById('page-login').classList.remove('active');
         document.getElementById('page-sim').classList.add('active');
-        const canvas = document.getElementById('canvas-container');
-        const inputSection = document.getElementById('input-section');
+        document.getElementById('display-name').innerText = myName;
+        document.getElementById('display-role').innerText = role;
 
+        const canvas = document.getElementById('canvas');
         if(role === 'OC') {
-            canvas.classList.add('bg-oc'); // Bovenaanzicht
-            inputSection.innerHTML = `
-                <strong>OC FEEDBACK PANEEL</strong><br>
-                <label><input type="checkbox" class="fb-opt" value="Tijdsvorm Fout"> Tijdsvorm</label><br>
-                <label><input type="checkbox" class="fb-opt" value="Trechter Fout"> Trechter (L->R)</label>
-                <p style="font-size:11px">Klik op een melding in de feed om feedback toe te passen.</p>
-            `;
+            canvas.classList.add('bg-oc');
+            document.getElementById('oc-controls').style.display = 'block';
+            document.getElementById('unit-controls').style.display = 'none';
         } else {
-            // Random perspectief voor Eenheid
-            const views = ['view1', 'view2', 'view3'];
-            const randomView = views[Math.floor(Math.random() * views.length)];
-            canvas.classList.add('bg-unit'); // Gebruikt jouw repository afbeelding
-            inputSection.innerHTML = `
-                <textarea id="msgInput" placeholder="Paradigma: Ik bevond mij..."></textarea>
-                <button onclick="verstuurMelding('${role}')" style="width:100%; background:var(--police-blue); color:white; border:none; padding:10px; cursor:pointer;">STUUR MELDING</button>
-            `;
+            const randomNum = Math.floor(Math.random() * 3) + 1;
+            canvas.classList.add('bg-unit-' + randomNum);
         }
 
-        // Render Stickers
         items.forEach(item => {
             const el = document.createElement('div');
             el.className = 'element';
             el.style.width = item.size + 'px';
-            el.innerHTML = `<img src="${item.img}" style="width:100%"><div class="label">${item.name}</div>`;
+            el.innerHTML = `<img src="${item.img}"><div class="label">${item.name}</div>`;
             canvas.appendChild(el);
 
             if(role === 'OC') {
@@ -134,23 +140,19 @@
 
             onValue(ref(db, 'positions/' + item.id), (snap) => {
                 const p = snap.val();
-                if(p) {
-                    el.style.left = p.x + '%';
-                    el.style.top = p.y + '%';
-                }
+                if(p) { el.style.left = p.x + '%'; el.style.top = p.y + '%'; }
             });
         });
 
-        // Live Feed synchronisatie
         onValue(ref(db, 'feed'), (snap) => {
             const feed = document.getElementById('livefeed');
-            feed.innerHTML = '<h3>Live Feed</h3>';
+            feed.innerHTML = '';
             snap.forEach(child => {
                 const data = child.val();
                 const div = document.createElement('div');
                 div.className = 'melding';
                 div.innerHTML = `<strong>${data.sender}:</strong> ${data.msg}`;
-                if(data.fb) data.fb.forEach(f => div.innerHTML += `<br><span class="feedback-badge">${f}</span>`);
+                if(data.fb) data.fb.forEach(f => div.innerHTML += `<br><span class="fb-badge">${f}</span>`);
                 if(role === 'OC') div.onclick = () => {
                     const selected = Array.from(document.querySelectorAll('.fb-opt:checked')).map(c => c.value);
                     update(ref(db, 'feed/' + child.key), { fb: selected });
@@ -161,10 +163,10 @@
         });
     };
 
-    window.verstuurMelding = (role) => {
+    window.sendMsg = () => {
         const input = document.getElementById('msgInput');
         if(input.value) {
-            push(ref(db, 'feed'), { sender: role, msg: input.value, fb: [], time: Date.now() });
+            push(ref(db, 'feed'), { sender: myName, msg: input.value, fb: [], time: Date.now() });
             input.value = '';
         }
     };
