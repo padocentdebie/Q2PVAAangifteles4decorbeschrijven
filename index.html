@@ -2,42 +2,51 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <title>PD-Simulator: Lijnbaansgracht 12 - Multi-View</title>
+    <title>PD-Simulator: Lijnbaansgracht 12</title>
     <style>
         :root { --police-blue: #00529b; --gold: #d4af37; --error: #e74c3c; }
         body { font-family: 'Arial', sans-serif; margin: 0; background: #1a1a1a; color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        /* Pagina Logica */
         .page { display: none; flex: 1; }
         .active { display: flex; }
 
-        /* Login Scherm */
-        #page-login { align-items: center; justify-content: center; flex-direction: column; background: radial-gradient(circle, #00529b, #002d54); }
-        .login-card { background: white; padding: 30px; border-radius: 8px; color: #333; text-align: center; width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        input[type="text"] { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
-        .btn-login { background: var(--police-blue); color: white; border: none; padding: 14px; width: 100%; margin-top: 10px; cursor: pointer; font-weight: bold; border-radius: 4px; transition: 0.2s; }
-        .btn-login:hover { background: #003d73; }
+        /* Login */
+        #page-login { align-items: center; justify-content: center; flex-direction: column; background: #002d54; }
+        .login-card { background: white; padding: 30px; border-radius: 8px; color: #333; text-align: center; width: 320px; }
+        input[type="text"] { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn-login { background: var(--police-blue); color: white; border: none; padding: 14px; width: 100%; margin-top: 10px; cursor: pointer; font-weight: bold; border-radius: 4px; }
 
-        /* Hoofd Layout */
+        /* Simulator */
         .main-layout { display: flex; flex: 1; width: 100%; overflow: hidden; }
-        .canvas-area { flex: 2; position: relative; border: 2px solid #444; overflow: hidden; background-color: #222; }
-        .sidebar { flex: 1; background: #f4f4f4; color: #333; display: flex; flex-direction: column; border-left: 2px solid #ddd; }
+        .canvas-area { 
+            flex: 2; 
+            position: relative; 
+            border: 2px solid #444; 
+            overflow: hidden; 
+            background-color: #333; /* Fallback kleur */
+            background-size: contain; 
+            background-repeat: no-repeat; 
+            background-position: center; 
+        }
 
-        /* Achtergronden per rol */
-        /* Zorg dat deze bestanden in je repository staan! */
-        .bg-oc { background-image: url('plattegrond.png'); background-size: contain; background-repeat: no-repeat; background-position: center; }
-        .bg-unit-1 { background-image: url('Q2les4PVAangiftedecor.png'); background-size: cover; background-position: center; }
-        .bg-unit-2 { background-image: url('Q2les4PVAangiftedecor_2.png'); background-size: cover; background-position: center; }
-        .bg-unit-3 { background-image: url('Q2les4PVAangiftedecor_3.png'); background-size: cover; background-position: center; }
-
-        /* Stickers / Voorwerpen */
-        .element { position: absolute; cursor: move; display: flex; flex-direction: column; align-items: center; z-index: 100; transform: translate(-50%, -50%); pointer-events: auto; }
-        .element img { filter: drop-shadow(2px 4px 5px rgba(0,0,0,0.8)); pointer-events: none; }
+        /* Stickers */
+        .element { 
+            position: absolute; 
+            cursor: move; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            z-index: 100; 
+            transform: translate(-50%, -50%); 
+            min-width: 40px;
+        }
+        .element img { width: 100%; filter: drop-shadow(2px 4px 5px rgba(0,0,0,0.8)); pointer-events: none; }
         .label { font-size: 10px; background: rgba(0,0,0,0.8); color: white; padding: 2px 5px; border-radius: 3px; margin-top: 2px; white-space: nowrap; }
 
-        /* Live Feed & Feedback */
+        /* Sidebar & Feed */
+        .sidebar { flex: 1; background: #f4f4f4; color: #333; display: flex; flex-direction: column; border-left: 2px solid #ddd; }
         #livefeed { flex: 1; overflow-y: auto; padding: 15px; background: #e9ecef; }
-        .melding { background: white; border-left: 5px solid var(--police-blue); margin-bottom: 10px; padding: 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; }
+        .melding { background: white; border-left: 5px solid var(--police-blue); margin-bottom: 10px; padding: 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .fb-badge { display: inline-block; background: var(--error); color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; margin-top: 5px; font-weight: bold; }
         
         .controls { padding: 15px; background: white; border-top: 1px solid #ccc; }
@@ -48,34 +57,29 @@
 
 <div id="page-login" class="page active">
     <div class="login-card">
-        <h2 style="margin-top:0">PD Simulator</h2>
-        <input type="text" id="userName" placeholder="Vul je voornaam in...">
-        <button class="btn-login" onclick="startApp('OC')">Inloggen als OC (God-mode)</button>
+        <h2 style="margin:0">PD Simulator</h2>
+        <input type="text" id="userName" placeholder="Je voornaam...">
+        <button class="btn-login" onclick="startApp('OC')">Inloggen als OC</button>
         <button class="btn-login" onclick="startApp('UNIT')" style="background:#555;">Inloggen als Eenheid</button>
     </div>
 </div>
 
 <div id="page-sim" class="page">
     <div class="main-layout">
-        <div id="canvas" class="canvas-area">
-            </div>
+        <div id="canvas" class="canvas-area"></div>
         <div class="sidebar">
-            <div style="padding:10px; background:var(--police-blue); color:white; font-size:12px; font-weight:bold;">
-                GEBRUIKER: <span id="display-name">-</span> | ROL: <span id="display-role">-</span>
-            </div>
             <div id="livefeed"></div>
             <div class="controls">
-                <div id="unit-input-area">
-                    <textarea id="msgInput" placeholder="Schrijf je PV volgens het paradigma..."></textarea>
+                <div id="unit-area">
+                    <textarea id="msgInput" placeholder="Paradigma: Ik bevond mij..."></textarea>
                     <button class="btn-login" onclick="sendMsg()">MELD AAN OC</button>
                 </div>
-                <div id="oc-input-area" style="display:none; color:#333; font-size: 13px;">
+                <div id="oc-area" style="display:none;">
                     <strong>Paradigma Feedback:</strong><br>
-                    <label><input type="checkbox" class="fb-opt" value="Tijdsvorm Fout"> 1. Tijdsvorm (is/was)</label><br>
-                    <label><input type="checkbox" class="fb-opt" value="Trechter Fout"> 2. Trechter (L naar R)</label><br>
-                    <label><input type="checkbox" class="fb-opt" value="Onderwerp Fout"> 3. Object = Onderwerp</label><br>
-                    <label><input type="checkbox" class="fb-opt" value="Positie Fout"> 4. Positie Verbalisant (Ik)</label>
-                    <p style="color:gray; font-size:11px; margin-top:5px;">Vink de fouten aan en klik op een bericht hierboven.</p>
+                    <label><input type="checkbox" class="fb-opt" value="Tijdsvorm Fout"> 1. Tijdsvorm</label><br>
+                    <label><input type="checkbox" class="fb-opt" value="Trechter Fout"> 2. Trechter</label><br>
+                    <label><input type="checkbox" class="fb-opt" value="Onderwerp Fout"> 3. Onderwerp</label><br>
+                    <label><input type="checkbox" class="fb-opt" value="Positie Fout"> 4. Positie</label>
                 </div>
             </div>
         </div>
@@ -101,93 +105,81 @@
     let currentUser = "";
     let currentRole = "";
 
-    // De voorwerpen met gegarandeerde icoon-URL's
+    // Stickers met absolute URL's (icons8) zodat ze altijd laden
     const items = [
-        { id: 'container', name: 'Container', img: 'https://img.icons8.com/color/150/dumpster.png', size: 90 },
-        { id: 'wapen', name: 'Vuurwapen', img: 'https://img.icons8.com/color/150/handgun.png', size: 60 },
-        { id: 'huls', name: 'Koperen huls', img: 'https://img.icons8.com/color/100/bullet.png', size: 30 },
-        { id: 'schoen', name: 'Schoenafdruk', img: 'https://img.icons8.com/ios-filled/100/footprint.png', size: 50 },
-        { id: 'b1', name: 'Bordje 1', img: 'https://img.icons8.com/color/96/1-circle.png', size: 35 }
+        { id: 'container', name: 'Container', img: 'https://img.icons8.com/color/96/dumpster.png', size: 80 },
+        { id: 'wapen', name: 'Pistool', img: 'https://img.icons8.com/color/96/handgun.png', size: 50 },
+        { id: 'huls', name: 'Koperen huls', img: 'https://img.icons8.com/color/96/bullet.png', size: 30 },
+        { id: 'schoen', name: 'Voetafdruk', img: 'https://img.icons8.com/ios-filled/100/footprint.png', size: 50 },
+        { id: 'b1', name: 'Bordje 1', img: 'https://img.icons8.com/color/96/1-circle.png', size: 40 }
     ];
 
     window.startApp = (role) => {
-        currentUser = document.getElementById('userName').value;
-        if(!currentUser) return alert("Vul je naam in!");
+        currentUser = document.getElementById('userName').value || "Agent";
         currentRole = role;
-
         document.getElementById('page-login').classList.remove('active');
         document.getElementById('page-sim').classList.add('active');
-        document.getElementById('display-name').innerText = currentUser;
-        document.getElementById('display-role').innerText = role;
 
         const canvas = document.getElementById('canvas');
         if(role === 'OC') {
-            canvas.classList.add('bg-oc');
-            document.getElementById('oc-input-area').style.display = 'block';
-            document.getElementById('unit-input-area').style.display = 'none';
+            canvas.style.backgroundImage = "url('plattegrond.png')";
+            document.getElementById('oc-area').style.display = 'block';
+            document.getElementById('unit-area').style.display = 'none';
         } else {
-            const randomView = Math.floor(Math.random() * 3) + 1;
-            canvas.classList.add('bg-unit-' + randomView);
+            // Random gezichtspunt
+            const views = ['Q2les4PVAangiftedecor.png', 'Q2les4PVAangiftedecor_2.png', 'Q2les4PVAangiftedecor_3.png'];
+            canvas.style.backgroundImage = `url('${views[Math.floor(Math.random()*views.size)]}')`;
         }
 
-        // Render objecten
         items.forEach(item => {
             const el = document.createElement('div');
-            el.id = 'obj-' + item.id;
             el.className = 'element';
             el.style.width = item.size + 'px';
-            el.innerHTML = `<img src="${item.img}" style="width:100%"><div class="label">${item.name}</div>`;
+            el.innerHTML = `<img src="${item.img}"><div class="label">${item.name}</div>`;
             canvas.appendChild(el);
 
             if(role === 'OC') {
                 el.onmousedown = (e) => {
                     document.onmousemove = (ev) => {
                         const rect = canvas.getBoundingClientRect();
-                        // Bereken positie in % voor cross-device compatibiliteit
-                        let xPerc = ((ev.clientX - rect.left) / rect.width) * 100;
-                        let yPerc = ((ev.clientY - rect.top) / rect.height) * 100;
-                        set(ref(db, 'positions/' + item.id), { x: xPerc, y: yPerc });
+                        set(ref(db, 'positions/' + item.id), { 
+                            x: ((ev.clientX - rect.left) / rect.width) * 100, 
+                            y: ((ev.clientY - rect.top) / rect.height) * 100 
+                        });
                     };
                     document.onmouseup = () => document.onmousemove = null;
                 };
             }
 
-            // Sync posities
             onValue(ref(db, 'positions/' + item.id), (snap) => {
                 const pos = snap.val();
-                if(pos) {
-                    el.style.left = pos.x + '%';
-                    el.style.top = pos.y + '%';
-                }
+                if(pos) { el.style.left = pos.x + '%'; el.style.top = pos.y + '%'; }
+                else if(role === 'OC') { el.style.left = '10%'; el.style.top = '10%'; } // Startpositie voor OC
             });
         });
     };
 
-    // Berichtgeving & Feedback
     window.sendMsg = () => {
         const msg = document.getElementById('msgInput').value;
         if(msg) {
-            push(ref(db, 'feed'), { sender: currentUser, msg: msg, fb: [], time: Date.now() });
+            push(ref(db, 'feed'), { sender: currentUser, msg: msg, fb: [] });
             document.getElementById('msgInput').value = '';
         }
     };
 
     onValue(ref(db, 'feed'), (snap) => {
         const feed = document.getElementById('livefeed');
-        feed.innerHTML = '<h3 style="margin-top:0; font-size:16px;">Live PV Feed</h3>';
+        feed.innerHTML = '<h3>Live PV Feed</h3>';
         snap.forEach(child => {
             const data = child.val();
             const div = document.createElement('div');
             div.className = 'melding';
             div.innerHTML = `<strong>${data.sender}:</strong> ${data.msg}`;
             if(data.fb) data.fb.forEach(f => div.innerHTML += `<br><span class="fb-badge">⚠️ ${f}</span>`);
-            
-            if(currentRole === 'OC') {
-                div.onclick = () => {
-                    const selectedFb = Array.from(document.querySelectorAll('.fb-opt:checked')).map(cb => cb.value);
-                    update(ref(db, 'feed/' + child.key), { fb: selectedFb });
-                };
-            }
+            if(currentRole === 'OC') div.onclick = () => {
+                const fb = Array.from(document.querySelectorAll('.fb-opt:checked')).map(c => c.value);
+                update(ref(db, 'feed/' + child.key), { fb: fb });
+            };
             feed.appendChild(div);
         });
         feed.scrollTop = feed.scrollHeight;
