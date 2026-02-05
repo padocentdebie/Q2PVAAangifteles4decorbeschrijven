@@ -7,60 +7,43 @@
         :root { --police-blue: #00529b; --gold: #d4af37; --error: #e74c3c; }
         body { font-family: 'Arial', sans-serif; margin: 0; background: #1a1a1a; color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
+        /* Pagina's */
         .page { display: none; flex: 1; }
         .active { display: flex; }
 
         /* Login */
-        #page-login { align-items: center; justify-content: center; flex-direction: column; background: #002d54; }
-        .login-card { background: white; padding: 30px; border-radius: 8px; color: #333; text-align: center; width: 320px; }
-        input[type="text"] { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        #page-login { align-items: center; justify-content: center; flex-direction: column; background: radial-gradient(circle, #00529b, #002d54); }
+        .login-card { background: white; padding: 30px; border-radius: 8px; color: #333; text-align: center; width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        input[type="text"] { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
         .btn-login { background: var(--police-blue); color: white; border: none; padding: 14px; width: 100%; margin-top: 10px; cursor: pointer; font-weight: bold; border-radius: 4px; }
 
-        /* Simulator */
-        .main-layout { display: flex; flex: 1; width: 100%; overflow: hidden; }
-        .canvas-area { 
-            flex: 2; 
-            position: relative; 
-            border: 2px solid #444; 
-            overflow: hidden; 
-            background-color: #333; /* Fallback kleur */
-            background-size: contain; 
-            background-repeat: no-repeat; 
-            background-position: center; 
-        }
+        /* Hoofd Layout */
+        .main-layout { display: flex; flex: 1; width: 100%; }
+        .canvas-area { flex: 2; position: relative; border-right: 2px solid #444; background-color: #222; background-size: contain; background-repeat: no-repeat; background-position: center; }
+        .sidebar { flex: 1; background: #f4f4f4; color: #333; display: flex; flex-direction: column; }
 
         /* Stickers */
-        .element { 
-            position: absolute; 
-            cursor: move; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            z-index: 100; 
-            transform: translate(-50%, -50%); 
-            min-width: 40px;
-        }
-        .element img { width: 100%; filter: drop-shadow(2px 4px 5px rgba(0,0,0,0.8)); pointer-events: none; }
-        .label { font-size: 10px; background: rgba(0,0,0,0.8); color: white; padding: 2px 5px; border-radius: 3px; margin-top: 2px; white-space: nowrap; }
+        .element { position: absolute; cursor: move; display: flex; flex-direction: column; align-items: center; z-index: 100; transform: translate(-50%, -50%); }
+        .element img { filter: drop-shadow(2px 4px 5px rgba(0,0,0,0.8)); pointer-events: none; }
+        .label { font-size: 10px; background: rgba(0,0,0,0.8); color: white; padding: 2px 4px; border-radius: 3px; margin-top: 2px; white-space: nowrap; }
 
-        /* Sidebar & Feed */
-        .sidebar { flex: 1; background: #f4f4f4; color: #333; display: flex; flex-direction: column; border-left: 2px solid #ddd; }
+        /* Feed */
         #livefeed { flex: 1; overflow-y: auto; padding: 15px; background: #e9ecef; }
         .melding { background: white; border-left: 5px solid var(--police-blue); margin-bottom: 10px; padding: 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .fb-badge { display: inline-block; background: var(--error); color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; margin-top: 5px; font-weight: bold; }
+        .fb-badge { display: inline-block; background: var(--error); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-top: 5px; font-weight: bold; }
         
         .controls { padding: 15px; background: white; border-top: 1px solid #ccc; }
-        textarea { width: 100%; height: 80px; padding: 10px; border: 2px solid #ccc; border-radius: 4px; box-sizing: border-box; resize: none; }
+        textarea { width: 100%; height: 70px; padding: 10px; border: 2px solid #ccc; border-radius: 4px; box-sizing: border-box; resize: none; }
     </style>
 </head>
 <body>
 
 <div id="page-login" class="page active">
     <div class="login-card">
-        <h2 style="margin:0">PD Simulator</h2>
-        <input type="text" id="userName" placeholder="Je voornaam...">
-        <button class="btn-login" onclick="startApp('OC')">Inloggen als OC</button>
-        <button class="btn-login" onclick="startApp('UNIT')" style="background:#555;">Inloggen als Eenheid</button>
+        <h3>PD Simulator v2.6</h3>
+        <input type="text" id="userName" placeholder="Vul je voornaam in...">
+        <button class="btn-login" onclick="startApp('OC')">Login als OC</button>
+        <button class="btn-login" onclick="startApp('UNIT')" style="background:#555;">Login als Eenheid</button>
     </div>
 </div>
 
@@ -68,18 +51,22 @@
     <div class="main-layout">
         <div id="canvas" class="canvas-area"></div>
         <div class="sidebar">
+            <div style="padding:10px; background:var(--police-blue); color:white; font-size:11px;">
+                NAAM: <span id="display-name"></span> | ROL: <span id="display-role"></span>
+            </div>
             <div id="livefeed"></div>
             <div class="controls">
                 <div id="unit-area">
                     <textarea id="msgInput" placeholder="Paradigma: Ik bevond mij..."></textarea>
-                    <button class="btn-login" onclick="sendMsg()">MELD AAN OC</button>
+                    <button class="btn-login" onclick="sendMsg()">MELDEN</button>
                 </div>
-                <div id="oc-area" style="display:none;">
+                <div id="oc-area" style="display:none; font-size:13px;">
                     <strong>Paradigma Feedback:</strong><br>
-                    <label><input type="checkbox" class="fb-opt" value="Tijdsvorm Fout"> 1. Tijdsvorm</label><br>
-                    <label><input type="checkbox" class="fb-opt" value="Trechter Fout"> 2. Trechter</label><br>
-                    <label><input type="checkbox" class="fb-opt" value="Onderwerp Fout"> 3. Onderwerp</label><br>
-                    <label><input type="checkbox" class="fb-opt" value="Positie Fout"> 4. Positie</label>
+                    <label><input type="checkbox" class="fb-opt" value="Tijdsvorm Fout"> 1. Tijdsvorm (was/is)</label><br>
+                    <label><input type="checkbox" class="fb-opt" value="Trechter Fout"> 2. Trechter (L->R)</label><br>
+                    <label><input type="checkbox" class="fb-opt" value="Onderwerp Fout"> 3. Onderwerp = Object</label><br>
+                    <label><input type="checkbox" class="fb-opt" value="Positie Fout"> 4. Positie Verbalisant (Ik)</label>
+                    <p style="color:gray; font-size:10px;">Vink aan en klik op een melding hierboven.</p>
                 </div>
             </div>
         </div>
@@ -89,6 +76,16 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js";
     import { getDatabase, ref, onValue, set, push, update } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-database.js";
+
+    // CONFIGURATIE - PAS HIER DE NAMEN AAN INDIEN NODIG
+    const DECOR_CONFIG = {
+        oc: 'plattegrond.png',
+        units: [
+            'Q2les4PVAangiftedecor.png',
+            'Q2les4PVAangiftedecor_2.png',
+            'Q2les4PVAangiftedecor_3.png'
+        ]
+    };
 
     const firebaseConfig = {
         apiKey: "AIzaSyB12mTMBnuxdC4W4htyFO_C7Dnh3maVKew",
@@ -102,87 +99,84 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    let currentUser = "";
-    let currentRole = "";
+    let myName, myRole;
 
-    // Stickers met absolute URL's (icons8) zodat ze altijd laden
     const items = [
-        { id: 'container', name: 'Container', img: 'https://img.icons8.com/color/96/dumpster.png', size: 80 },
-        { id: 'wapen', name: 'Pistool', img: 'https://img.icons8.com/color/96/handgun.png', size: 50 },
+        { id: 'container', name: 'Container', img: 'https://img.icons8.com/color/96/dumpster.png', size: 90 },
+        { id: 'wapen', name: 'Pistool', img: 'https://img.icons8.com/color/96/handgun.png', size: 60 },
         { id: 'huls', name: 'Koperen huls', img: 'https://img.icons8.com/color/96/bullet.png', size: 30 },
         { id: 'schoen', name: 'Voetafdruk', img: 'https://img.icons8.com/ios-filled/100/footprint.png', size: 50 },
         { id: 'b1', name: 'Bordje 1', img: 'https://img.icons8.com/color/96/1-circle.png', size: 40 }
     ];
 
     window.startApp = (role) => {
-        currentUser = document.getElementById('userName').value || "Agent";
-        currentRole = role;
+        myName = document.getElementById('userName').value || "Agent";
+        myRole = role;
         document.getElementById('page-login').classList.remove('active');
         document.getElementById('page-sim').classList.add('active');
+        document.getElementById('display-name').innerText = myName;
+        document.getElementById('display-role').innerText = role;
 
         const canvas = document.getElementById('canvas');
         if(role === 'OC') {
-            canvas.style.backgroundImage = "url('plattegrond.png')";
+            canvas.style.backgroundImage = `url('${DECOR_CONFIG.oc}')`;
             document.getElementById('oc-area').style.display = 'block';
             document.getElementById('unit-area').style.display = 'none';
         } else {
-            // Random gezichtspunt
-            const views = ['Q2les4PVAangiftedecor.png', 'Q2les4PVAangiftedecor_2.png', 'Q2les4PVAangiftedecor_3.png'];
-            canvas.style.backgroundImage = `url('${views[Math.floor(Math.random()*views.size)]}')`;
+            const randomImg = DECOR_CONFIG.units[Math.floor(Math.random() * DECOR_CONFIG.units.length)];
+            canvas.style.backgroundImage = `url('${randomImg}')`;
         }
 
         items.forEach(item => {
             const el = document.createElement('div');
             el.className = 'element';
             el.style.width = item.size + 'px';
-            el.innerHTML = `<img src="${item.img}"><div class="label">${item.name}</div>`;
+            el.innerHTML = `<img src="${item.img}" style="width:100%"><div class="label">${item.name}</div>`;
             canvas.appendChild(el);
 
             if(role === 'OC') {
                 el.onmousedown = (e) => {
                     document.onmousemove = (ev) => {
-                        const rect = canvas.getBoundingClientRect();
+                        const r = canvas.getBoundingClientRect();
                         set(ref(db, 'positions/' + item.id), { 
-                            x: ((ev.clientX - rect.left) / rect.width) * 100, 
-                            y: ((ev.clientY - rect.top) / rect.height) * 100 
+                            x: ((ev.clientX - r.left) / r.width) * 100, 
+                            y: ((ev.clientY - r.top) / r.height) * 100 
                         });
                     };
                     document.onmouseup = () => document.onmousemove = null;
                 };
             }
-
-            onValue(ref(db, 'positions/' + item.id), (snap) => {
-                const pos = snap.val();
-                if(pos) { el.style.left = pos.x + '%'; el.style.top = pos.y + '%'; }
-                else if(role === 'OC') { el.style.left = '10%'; el.style.top = '10%'; } // Startpositie voor OC
+            onValue(ref(db, 'positions/' + item.id), (s) => {
+                const p = s.val();
+                if(p) { el.style.left = p.x + '%'; el.style.top = p.y + '%'; }
             });
         });
     };
 
     window.sendMsg = () => {
-        const msg = document.getElementById('msgInput').value;
-        if(msg) {
-            push(ref(db, 'feed'), { sender: currentUser, msg: msg, fb: [] });
-            document.getElementById('msgInput').value = '';
+        const input = document.getElementById('msgInput');
+        if(input.value) {
+            push(ref(db, 'feed'), { sender: myName, msg: input.value, fb: [] });
+            input.value = '';
         }
     };
 
-    onValue(ref(db, 'feed'), (snap) => {
-        const feed = document.getElementById('livefeed');
-        feed.innerHTML = '<h3>Live PV Feed</h3>';
-        snap.forEach(child => {
-            const data = child.val();
+    onValue(ref(db, 'feed'), (s) => {
+        const f = document.getElementById('livefeed');
+        f.innerHTML = '<h4>PV FEED</h4>';
+        s.forEach(c => {
+            const d = c.val();
             const div = document.createElement('div');
             div.className = 'melding';
-            div.innerHTML = `<strong>${data.sender}:</strong> ${data.msg}`;
-            if(data.fb) data.fb.forEach(f => div.innerHTML += `<br><span class="fb-badge">⚠️ ${f}</span>`);
-            if(currentRole === 'OC') div.onclick = () => {
-                const fb = Array.from(document.querySelectorAll('.fb-opt:checked')).map(c => c.value);
-                update(ref(db, 'feed/' + child.key), { fb: fb });
+            div.innerHTML = `<strong>${d.sender}:</strong> ${d.msg}`;
+            if(d.fb) d.fb.forEach(err => div.innerHTML += `<br><span class="fb-badge">⚠️ ${err}</span>`);
+            if(myRole === 'OC') div.onclick = () => {
+                const fbSel = Array.from(document.querySelectorAll('.fb-opt:checked')).map(cb => cb.value);
+                update(ref(db, 'feed/' + c.key), { fb: fbSel });
             };
-            feed.appendChild(div);
+            f.appendChild(div);
         });
-        feed.scrollTop = feed.scrollHeight;
+        f.scrollTop = f.scrollHeight;
     });
 </script>
 </body>
