@@ -11,9 +11,13 @@
         .active { display: flex; }
 
         /* Login */
-        #page-login { justify-content: center; align-items: center; background: #001a33; }
-        .briefing-card { background: white; padding: 35px; border-radius: 2px; width: 90%; max-width: 650px; border-top: 8px solid var(--police-blue); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .opdracht-box { background: #f8f9fa; border-left: 4px solid var(--police-blue); padding: 15px; margin: 20px 0; font-style: italic; font-size: 14px; color: #333; }
+        #page-login { justify-content: center; align-items: center; background: #001a33; padding: 20px; }
+        .briefing-card { background: white; padding: 30px; border-radius: 2px; width: 100%; max-width: 750px; border-top: 8px solid var(--police-blue); box-shadow: 0 10px 40px rgba(0,0,0,0.6); max-height: 90vh; overflow-y: auto; }
+        
+        .theorie-box { background: #eef2f7; border: 1px solid #ccd6e0; padding: 15px; margin: 15px 0; font-size: 13px; color: #2c3e50; }
+        .theorie-box h2 { margin-top: 0; font-size: 14px; color: var(--police-blue); text-transform: uppercase; }
+        
+        .opdracht-box { background: #fffde7; border-left: 5px solid var(--gold); padding: 15px; margin: 20px 0; font-style: italic; font-size: 14px; color: #333; box-shadow: 2px 2px 5px rgba(0,0,0,0.05); }
 
         /* Simulator Layout */
         #page-sim.active { display: grid; grid-template-columns: 1fr 450px; }
@@ -54,24 +58,26 @@
 
     <div id="page-login" class="page active">
         <div class="briefing-card">
-            <h1 style="color: var(--police-blue); font-size: 24px; margin-top: 0;">Plaats Delict Simulatie</h1>
-            <p style="font-size: 15px; line-height: 1.6; color: #444;">
-                Welkom bij de decoroefening. Stel het decor vast volgens de geldende protocollen. 
-                Focus op objectiviteit, tijdsvormen en het verbod op interpretatieve termen.
-            </p>
+            <h1 style="color: var(--police-blue); font-size: 22px; margin-top: 0;">Simulatie Decor-beschrijving (PV Aangifte Les 4)</h1>
+            
+            <div class="theorie-box">
+                <h2>Theoretisch Kader</h2>
+                <p><strong>Kaal decor:</strong> Onveranderlijke elementen (muren, vloer, vaste objecten). Gebruik de <strong>tegenwoordige tijd</strong>. Beschrijf objectief van groot naar klein, links naar rechts.</p>
+                <p><strong>Veranderlijk decor:</strong> Elementen die door het incident zijn gewijzigd of verplaatst (sporen, braakschade, bloed, goederen). Gebruik de <strong>verleden tijd</strong>.</p>
+                <p><strong>Protocol:</strong> Start met <i>"Ik stond..."</i>. Gebruik het element als onderwerp in de zin. Geen interpretatie. Gebruik nooit de woorden: <i>zie, zag, kijk, je</i>.</p>
+            </div>
             
             <div class="opdracht-box">
                 <strong>Melding Operationeel Centrum (OC):</strong><br>
                 "Collega's, begeef je naar de Petsteeg 11 te Amersfoort. Er is daar mogelijk sprake van een verdachte situatie. Stel de situatie veilig en start direct met de verslaglegging van het decor."
             </div>
 
-            <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Kies een rol en voer je roepnummer of naam in:</p>
-            
-            <input type="text" id="userName" placeholder="Naam / Roepnummer" style="width:100%; padding:14px; margin-bottom:12px; border:1px solid #ccc; font-size: 16px; box-sizing: border-box;">
-            
-            <div style="display: flex; gap: 10px;">
-                <button onclick="startApp('UNIT')" class="btn-main">EERSTE TER PLAATSE (UNIT)</button>
-                <button onclick="startApp('OC')" class="btn-main" style="background:#444; width: 180px;">OC REGIE</button>
+            <div style="margin-top: 20px;">
+                <input type="text" id="userName" placeholder="Naam / Roepnummer" style="width:100%; padding:14px; margin-bottom:12px; border:1px solid #ccc; font-size: 16px; box-sizing: border-box;">
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="startApp('UNIT')" class="btn-main">MELDEN TER PLAATSE (UNIT)</button>
+                    <button onclick="startApp('OC')" class="btn-main" style="background:#444; width: 180px;">OC REGIE</button>
+                </div>
             </div>
         </div>
     </div>
@@ -83,7 +89,7 @@
 
         <div id="sidebar">
             <div id="oc-panel" style="display:none;">
-                <span class="checklist-title">PROTOCOLAFNAME (OC)</span>
+                <span class="checklist-title">PROTOCOLAFNAME (LES 4 STANDAARD)</span>
                 <div id="checklist-ui">
                     <label class="checklist-item"><input type="checkbox" class="oc-chk" data-label="Startzin"> Startzin "Ik stond..."</label>
                     <label class="checklist-item"><input type="checkbox" class="oc-chk" data-label="Kaal/Teg"> Kaal: Tegenwoordig</label>
@@ -92,7 +98,7 @@
                     <label class="checklist-item"><input type="checkbox" class="oc-chk" data-label="Onderwerp"> Element = Onderwerp</label>
                     <label class="checklist-item"><input type="checkbox" class="oc-chk" data-label="Verboden"> Geen zie/zag/kijk/je</label>
                 </div>
-                <textarea id="ocFeedbackField" rows="2" placeholder="Gerichte feedback..." style="font-size: 11px; margin-top: 8px;"></textarea>
+                <textarea id="ocFeedbackField" rows="2" placeholder="Feedback op beschrijving..." style="font-size: 11px; margin-top: 8px;"></textarea>
                 <div id="sporen-beheer"></div>
                 <button onclick="resetSim()" class="reset-link">Sessie resetten</button>
             </div>
@@ -100,7 +106,7 @@
             <div id="livefeed"></div>
 
             <div id="input-area">
-                <textarea id="msgInput" rows="3" placeholder="Typ uw beschrijving hier..."></textarea>
+                <textarea id="msgInput" rows="3" placeholder="Typ uw beschrijving conform protocol..."></textarea>
                 <button class="btn-main" onclick="verstuurMelding()">Verstuur Melding</button>
             </div>
         </div>
