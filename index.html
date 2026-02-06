@@ -10,20 +10,21 @@
         .page { display: none; height: 100%; width: 100%; }
         .active { display: flex; }
 
-        /* Login */
+        /* Login & Briefing */
         #page-login { justify-content: center; align-items: center; background: #001a33; padding: 20px; }
-        .briefing-card { background: white; padding: 30px; border-radius: 2px; width: 100%; max-width: 800px; border-top: 8px solid var(--police-blue); box-shadow: 0 10px 40px rgba(0,0,0,0.6); max-height: 95vh; overflow-y: auto; }
+        .briefing-card { background: white; padding: 30px; border-radius: 2px; width: 100%; max-width: 850px; border-top: 8px solid var(--police-blue); box-shadow: 0 10px 40px rgba(0,0,0,0.6); max-height: 95vh; overflow-y: auto; }
         
         .instruction-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 15px 0; }
-        .inst-box { background: #f1f4f8; padding: 15px; border-radius: 4px; font-size: 13px; border: 1px solid #d1d9e2; }
-        .inst-box h3 { margin-top: 0; color: var(--police-blue); font-size: 14px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+        .inst-box { background: #f1f4f8; padding: 15px; border-radius: 4px; font-size: 13px; border: 1px solid #d1d9e2; line-height: 1.5; }
+        .inst-box h3 { margin-top: 0; color: var(--police-blue); font-size: 14px; border-bottom: 1px solid #ccc; padding-bottom: 5px; text-transform: uppercase; }
         
         .opdracht-box { background: #fffde7; border-left: 5px solid var(--gold); padding: 15px; margin-bottom: 15px; font-style: italic; font-size: 14px; color: #333; }
+        .theorie-footer { background: #eee; padding: 10px; font-size: 11px; color: #555; border-radius: 2px; margin-top: 10px; }
 
         /* Simulator Layout */
         #page-sim.active { display: grid; grid-template-columns: 1fr 450px; }
         #foto-container { position: relative; background-size: cover; background-position: center; flex-grow: 1; background-color: #000; overflow: hidden; }
-        .unit-view-locked { filter: blur(35px) brightness(0.6); transition: filter 2s ease; }
+        .unit-view-locked { filter: blur(35px) brightness(0.6); transition: filter 2.5s ease; }
         #canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         
         /* Sidebar */
@@ -33,15 +34,15 @@
         
         .melding { border-bottom: 2px solid #eee; padding: 15px; font-size: 13px; margin-bottom: 10px; border-radius: 4px; }
         .melding-unit { border-left: 5px solid var(--police-blue); background: white; }
-        .melding-fb { background: #fffde7; border-left: 5px solid var(--gold); font-weight: 500; color: #444; }
+        .melding-fb { background: #fffde7; border-left: 5px solid var(--gold); font-weight: 600; color: #444; white-space: pre-wrap; }
         
-        .checklist-item { display: flex; align-items: center; font-size: 11px; margin-bottom: 4px; cursor: pointer; }
-        .btn-inline { border: none; padding: 6px; cursor: pointer; font-size: 10px; font-weight: bold; margin-top: 5px; width: 100%; text-transform: uppercase; border-radius: 2px; }
+        .checklist-item { display: flex; align-items: center; font-size: 11px; margin-bottom: 4px; cursor: pointer; font-weight: bold; }
+        .btn-inline { border: none; padding: 7px; cursor: pointer; font-size: 10px; font-weight: bold; margin-top: 5px; width: 100%; text-transform: uppercase; border-radius: 2px; }
         .vrijgave-btn { background: #27ae60; color: white; margin-bottom: 4px; }
-        .feedback-trigger-btn { background: var(--gold); color: black; }
+        .feedback-trigger-btn { background: var(--gold); color: black; border: 1px solid #ccac00; }
 
-        .spoor-item { position: absolute; transform: translate(-50%, -50%); cursor: move; }
-        .spoor-label { background: rgba(0,0,0,0.8); color:#fff; font-size:9px; padding:2px 4px; border-radius: 2px; text-align: center; margin-top: 5px; }
+        .spoor-item { position: absolute; transform: translate(-50%, -50%); cursor: move; z-index: 10; }
+        .spoor-label { background: rgba(0,0,0,0.8); color:#fff; font-size:9px; padding:2px 4px; border-radius: 2px; text-align: center; margin-top: 5px; pointer-events: none; }
 
         #input-area { padding: 15px; border-top: 1px solid #ddd; background: #fff; }
         textarea { width: 100%; border: 1px solid #ccc; padding: 10px; font-size: 14px; resize: none; box-sizing: border-box; }
@@ -58,28 +59,32 @@
             <h1 style="color: var(--police-blue); font-size: 22px; margin-top: 0;">Simulatie Decor-beschrijving (PV Aangifte Les 4)</h1>
             
             <div class="opdracht-box">
-                <strong>Briefing:</strong> "Petsteeg 11, Amersfoort. Verdachte situatie. Stel veilig en start decor-verslaglegging."
+                <strong>Briefing OC:</strong> "Collega's, naar de Petsteeg 11 te Amersfoort. Mogelijk verdachte situatie. Stel veilig en start decor-verslaglegging."
             </div>
 
             <div class="instruction-grid">
                 <div class="inst-box">
-                    <h3>EENHEID (Unit)</h3>
-                    1. <strong>Beschrijf vanuit Blur:</strong> Start met "Ik stond...". Beschrijf kaal decor (tegenwoordige tijd).<br>
-                    2. <strong>Wacht op Vrijgave:</strong> OC beoordeelt je tekst.<br>
-                    3. <strong>Scherp beeld:</strong> Beschrijf sporen (verleden tijd).
+                    <h3>WERKWIJZE: EENHEID</h3>
+                    1. <strong>Beschrijf vanuit Blur:</strong> Start met "Ik stond...". Beschrijf het <strong>kaal decor</strong> (tegenwoordige tijd).<br><br>
+                    2. <strong>Wacht op Vrijgave:</strong> OC beoordeelt je vakmanschap. Pas na akkoord wordt de 'mist' opgetrokken.<br><br>
+                    3. <strong>Scherp beeld:</strong> Beschrijf het <strong>veranderlijk decor</strong> in de verleden tijd.
                 </div>
                 <div class="inst-box">
-                    <h3>REGIE (OC)</h3>
-                    1. <strong>Interactie:</strong> Gebruik vinkjes om meldingen te beoordelen.<br>
-                    2. <strong>Vrijgeven:</strong> Haal de blur weg bij correcte positionering.<br>
-                    3. <strong>Sporen:</strong> Sleep, draai (rechtsklik) en schaal (scroll) sporen in het decor.
+                    <h3>WERKWIJZE: OC (REGIE)</h3>
+                    1. <strong>Interactie:</strong> Vink aan wat correct is. Klik op 'Beoordeel' bij een melding om feedback te sturen.<br><br>
+                    2. <strong>Vrijgave:</strong> Klik op 'Vrijgeven' om de blur bij een eenheid te verwijderen.<br><br>
+                    3. <strong>Decorbeheer:</strong> Sleep sporen, draai met rechtsklik en schaal met het muiswieltje.
                 </div>
+            </div>
+
+            <div class="opdracht-box" style="background: #f4f4f4; border-color: #333;">
+                <strong>Debriefing OC:</strong> "De situatie is onder controle. Bedankt voor de verslaglegging. De Forensische Opsporing neemt het over. Meld je af voor de administratieve afhandeling."
             </div>
 
             <input type="text" id="userName" placeholder="Roepnummer / Naam" style="width:100%; padding:14px; margin-bottom:12px; border:1px solid #ccc; font-size: 16px;">
             <div style="display: flex; gap: 10px;">
-                <button onclick="startApp('UNIT')" class="btn-main">START ALS EENHEID</button>
-                <button onclick="startApp('OC')" class="btn-main" style="background:#444; width: 200px;">START ALS OC</button>
+                <button onclick="startApp('UNIT')" class="btn-main">START EENHEID (TER PLAATSE)</button>
+                <button onclick="startApp('OC')" class="btn-main" style="background:#444; width: 200px;">START OC (REGIE)</button>
             </div>
         </div>
     </div>
@@ -91,21 +96,21 @@
 
         <div id="sidebar">
             <div id="oc-panel" style="display:none;">
-                <strong style="font-size:11px; color:var(--police-blue);">CHECKLIST PROTOCOL</strong>
+                <strong style="font-size:11px; color:var(--police-blue);">CHECKLIST PROTOCOL (OC)</strong>
                 <div id="checklist-ui">
                     <label class="checklist-item"><input type="checkbox" class="oc-chk" data-label="Startzin"> Startzin "Ik stond..."</label>
                     <label class="checklist-item"><input type="checkbox" class="oc-chk" data-label="Kaal/Teg"> Kaal: Tegenwoordig</label>
                     <label class="checklist-item"><input type="checkbox" class="oc-chk" data-label="Verand/Verl"> Veranderlijk: Verleden</label>
                     <label class="checklist-item"><input type="checkbox" class="oc-chk" data-label="Geen Zie/Zag"> Geen zie/zag/kijk/je</label>
                 </div>
-                <textarea id="ocFeedbackField" rows="2" placeholder="Vrije opmerking..." style="font-size: 11px; margin-top: 5px;"></textarea>
+                <textarea id="ocFeedbackField" rows="2" placeholder="Specifieke aanwijzing..." style="font-size: 11px; margin-top: 5px;"></textarea>
                 <div id="sporen-beheer"></div>
-                <button onclick="resetSim()" class="reset-link">Volledige Reset</button>
+                <button onclick="resetSim()" class="reset-link">Volledige Sessie Reset</button>
             </div>
             <div id="livefeed"></div>
             <div id="input-area">
-                <textarea id="msgInput" rows="3" placeholder="Typ je melding..."></textarea>
-                <button class="btn-main" onclick="verstuurMelding()">Verstuur Melding</button>
+                <textarea id="msgInput" rows="3" placeholder="Typ je melding conform protocol..."></textarea>
+                <button class="btn-main" onclick="verstuurMelding()">Verstuur naar OC</button>
             </div>
         </div>
     </div>
@@ -128,7 +133,7 @@
 
     window.startApp = (role) => {
         const n = document.getElementById('userName').value.trim();
-        if(!n) return alert("Voer een naam/nummer in.");
+        if(!n) return alert("Roepnummer/Naam verplicht.");
         myName = n; myRole = role;
         document.getElementById('page-login').classList.remove('active');
         document.getElementById('page-sim').classList.add('active');
@@ -154,8 +159,7 @@
     window.stuurFeedback = (targetName) => {
         const vinkjes = Array.from(document.querySelectorAll('.oc-chk')).map(c => (c.checked ? "✅" : "❌") + " " + c.getAttribute('data-label')).join("\n");
         const extra = document.getElementById('ocFeedbackField').value.trim();
-        push(ref(db, 'feed'), { sender: "OC", target: targetName, msg: "BEOORDELING:\n" + vinkjes + (extra ? "\n\nOpmerking: " + extra : ""), role: 'OC-FEEDBACK' });
-        document.getElementById('ocFeedbackField').value = '';
+        push(ref(db, 'feed'), { sender: "OC", target: targetName, msg: "BEOORDELING PROTOCOL:\n" + vinkjes + (extra ? "\n\nInstructie: " + extra : ""), role: 'OC-FEEDBACK' });
     };
 
     window.vrijgevenVoorUnit = (targetName) => set(ref(db, 'vrijgave/' + targetName), true);
@@ -177,11 +181,13 @@
                     div.className = `melding ${m.role === 'UNIT' ? 'melding-unit' : 'melding-fb'}`;
                     div.innerHTML = `<strong>${m.sender} ${m.view ? '['+m.view+']' : ''}</strong><br>${m.msg.replace(/\n/g, '<br>')}`;
                     if(myRole === 'OC' && m.role === 'UNIT') {
-                        const b1 = document.createElement('button'); b1.className='btn-inline feedback-trigger-btn'; b1.innerText='📝 Beoordeel ' + m.sender;
+                        const bContainer = document.createElement('div'); bContainer.style.display="flex"; bContainer.style.gap="4px";
+                        const b1 = document.createElement('button'); b1.className='btn-inline feedback-trigger-btn'; b1.innerText='📝 Beoordeel';
                         b1.onclick = () => stuurFeedback(m.sender);
-                        const b2 = document.createElement('button'); b2.className='btn-inline vrijgave-btn'; b2.innerText='🔓 Vrijgeven ' + m.sender;
+                        const b2 = document.createElement('button'); b2.className='btn-inline vrijgave-btn'; b2.innerText='🔓 Vrijgeven';
                         b2.onclick = () => vrijgevenVoorUnit(m.sender);
-                        div.appendChild(b2); div.appendChild(b1);
+                        bContainer.appendChild(b2); bContainer.appendChild(b1);
+                        div.appendChild(bContainer);
                     }
                     feed.prepend(div);
                 }
@@ -197,12 +203,14 @@
             document.querySelectorAll('.spoor-item').forEach(e => e.remove());
             Object.keys(data).forEach(id => {
                 const pos = data[id];
-                const sBase = sporenDef.find(x => x.id === id);
-                const div = document.createElement('div'); div.className = 'spoor-item';
-                div.style.left = pos.x + '%'; div.style.top = pos.y + '%';
-                div.innerHTML = `<img src="${sBase.img}" style="width:${pos.s}px; transform:rotate(${pos.r}deg); pointer-events:none;"><div class="spoor-label">${sBase.name}</div>`;
-                document.getElementById('canvas').appendChild(div);
-                if(myRole === 'OC') setupInteractie(div, id, pos.r, pos.s);
+                const sDef = sporenDef.find(x => x.id === id);
+                if(pos && sDef) {
+                    const div = document.createElement('div'); div.className = 'spoor-item';
+                    div.style.left = pos.x + '%'; div.style.top = pos.y + '%';
+                    div.innerHTML = `<img src="${sDef.img}" style="width:${pos.s}px; transform:rotate(${pos.r}deg); pointer-events:none;"><div class="spoor-label">${sDef.name}</div>`;
+                    document.getElementById('canvas').appendChild(div);
+                    if(myRole === 'OC') setupInteractie(div, id, pos.r, pos.s);
+                }
             });
         });
     }
@@ -217,10 +225,7 @@
             document.addEventListener('mousemove', move);
             document.onmouseup = () => document.removeEventListener('mousemove', move);
         };
-        div.oncontextmenu = (e) => { 
-            e.preventDefault(); 
-            update(ref(db, 'sporen/' + id), { r: (currentRot + 45) % 360 }); 
-        };
+        div.oncontextmenu = (e) => { e.preventDefault(); update(ref(db, 'sporen/' + id), { r: (currentRot + 45) % 360 }); };
         div.onwheel = (e) => {
             e.preventDefault();
             const delta = e.deltaY > 0 ? -10 : 10;
