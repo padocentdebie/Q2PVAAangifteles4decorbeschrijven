@@ -1,55 +1,214 @@
-<div class="briefing-card">
-    <h2>PD Beschrijving Protocol</h2>
-    <div style="font-size: 13px; line-height: 1.5; color: #444;">
-        <p><strong>AFSPRAKEN VOOR DE MELDING:</strong></p>
-        <ul style="padding-left: 20px;">
-            <li><strong>Positie:</strong> Start altijd met: "Ik stond..."</li>
-            <li><strong>Kaal decor:</strong> Beschrijf in de <u>tegenwoordige tijd</u> (muur, regenpijp).</li>
-            <li><strong>Sporen:</strong> Beschrijf in de <u>verleden tijd</u> (objecten/vlekken).</li>
-            <li><strong>Objectiviteit:</strong> Benoem <strong>geen</strong> namen van sporen. Beschrijf wat je ziet (bijv: "Een zwart metalen voorwerp", "Een rode vloeistof").</li>
-            <li><strong>Volgorde:</strong> Van links naar rechts, van groot naar klein.</li>
-            <li><strong>Onderwerp:</strong> Het element is altijd het onderwerp van de zin.</li>
-        </ul>
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PD-Simulatie | Briefing & Oefening</title>
+    <style>
+        :root { 
+            --police-blue: #003366; 
+            --gold: #FFD700; 
+            --bg: #f4f7f9; 
+            --white: #ffffff;
+        }
+        
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: var(--bg); height: 100vh; display: flex; flex-direction: column; }
+        
+        .page { display: none; height: 100%; }
+        .active { display: flex; }
+
+        /* Briefing / Login Scherm */
+        #page-login { justify-content: center; align-items: center; background: var(--police-blue); color: white; }
+        .briefing-card { background: white; color: #333; padding: 40px; border-radius: 4px; max-width: 550px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
+        .briefing-card h2 { color: var(--police-blue); margin-top: 0; border-bottom: 3px solid var(--gold); padding-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .stap-box { background: #eef2f7; padding: 15px; border-left: 5px solid var(--police-blue); margin: 20px 0; font-size: 15px; line-height: 1.4; }
+        .eisen-lijst { font-size: 14px; line-height: 1.6; background: #fffdf0; padding: 15px; border: 1px solid #f1e0a1; border-radius: 4px; }
+        .eisen-lijst ul { margin: 5px 0; padding-left: 20px; }
+
+        /* Simulator Interface */
+        #page-sim.active { display: grid; grid-template-columns: 1fr 400px; }
+        #foto-container { position: relative; background-size: cover; background-position: center; flex-grow: 1; background-color: #000; overflow: hidden; }
+        
+        /* Blur effect voor studenten */
+        .unit-view-locked { filter: blur(35px) grayscale(0.3); pointer-events: none; }
+        
+        #canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+        /* Sporen Stijl */
+        .spoor { position: absolute; transform: translate(-50%, -50%); z-index: 10; display: flex; flex-direction: column; align-items: center; cursor: move; }
+        .spoor img { filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
+        .spoor-label { background: var(--police-blue); color: white; padding: 2px 8px; font-size: 11px; border-radius: 2px; margin-top: 5px; font-weight: bold; text-transform: uppercase; }
+
+        /* Sidebar & Feed */
+        #sidebar { background: var(--white); border-left: 1px solid #ddd; display: flex; flex-direction: column; }
+        #livefeed { flex-grow: 1; overflow-y: auto; padding: 20px; background: #fafafa; }
+        .melding { background: white; border: 1px solid #e0e0e0; padding: 15px; margin-bottom: 12px; font-size: 14px; border-left: 5px solid #ccc; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+        .melding-fb { border-left-color: var(--gold); background: #fffde7; font-style: italic; }
+        .melding strong { color: var(--police-blue); display: block; margin-bottom: 5px; border-bottom: 1px solid #eee; padding-bottom: 3px; }
+        .view-tag { float: right; background: #eee; padding: 2px 6px; border-radius: 10px; font-size: 10px; color: #666; }
+
+        /* Bediening */
+        #input-area { padding: 20px; border-top: 1px solid #ddd; background: #fff; }
+        textarea { width: 100%; border: 1px solid #ccc; padding: 12px; box-sizing: border-box; resize: none; font-family: inherit; font-size: 14px; border-radius: 4px; }
+        .btn { background: var(--police-blue); color: white; border: none; padding: 14px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; border-radius: 4px; transition: background 0.2s; }
+        .btn:hover { background: #002244; }
+        
+        /* OC Paneel */
+        #oc-panel { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.95); padding: 20px; border-radius: 4px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 100; min-width: 200px; }
+        .spoor-btn { padding: 8px; margin: 3px; cursor: pointer; background: white; border: 1px solid #ccc; font-weight: bold; }
+        .spoor-btn:hover { background: #eee; }
+        .feedback-link { font-size: 11px; color: var(--police-blue); cursor: pointer; text-decoration: underline; margin-top: 8px; display: inline-block; }
+    </style>
+</head>
+<body>
+
+    <div id="page-login" class="page active">
+        <div class="briefing-card">
+            <h2>Briefing PD-Simulatie</h2>
+            
+            <div class="stap-box">
+                <strong>Stap 1: De blur verwijderen</strong><br>
+                Meld je locatie en beschrijf de vaste elementen van het decor (muren, objecten).
+                Start je melding altijd met: <strong>"Ik stond..."</strong>
+                <br><br>
+                <em>Zodra de beschrijving correct is, geeft het OC het beeld vrij.</em>
+            </div>
+
+            <div class="eisen-lijst">
+                <strong>Stap 2: Volledige melding (Eisen)</strong>
+                <ul>
+                    <li><strong>Tijd:</strong> Kaal decor = tegenwoordige tijd. Sporen = verleden tijd.</li>
+                    <li><strong>Objectiviteit:</strong> Noem GEEN namen van sporen (geen pistool, bloed, huls).</li>
+                    <li><strong>Kenmerken:</strong> Beschrijf alleen vorm, kleur, materiaal en grootte.</li>
+                    <li><strong>Geen waarneming:</strong> Gebruik geen 'zie/zag'. Het object is het onderwerp.</li>
+                    <li><strong>Structuur:</strong> Werk van links naar rechts en van groot naar klein.</li>
+                </ul>
+            </div>
+
+            <div style="margin-top:20px;">
+                <label for="userName"><strong>Verbalisant / Eenheid:</strong></label>
+                <input type="text" id="userName" placeholder="bijv. Unit 01 - Janssen" style="width:100%; padding:12px; margin-top:8px; border:1px solid #ccc; box-sizing:border-box; border-radius:4px;">
+                
+                <div style="display:flex; gap:15px; margin-top:20px;">
+                    <button onclick="startApp('UNIT')" class="btn" style="flex:2;">START ALS EENHEID</button>
+                    <button onclick="startApp('OC')" class="btn" style="background:#555; flex:1;">OC LOGIN</button>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <div id="page-sim" class="page">
+        <div id="foto-container">
+            <div id="canvas"></div>
+            
+            <div id="oc-panel" style="display:none;">
+                <strong style="color:var(--police-blue);">🛠 OC BEHEER</strong><hr>
+                <p style="font-size:11px; margin: 5px 0;">Klik om spoor te plaatsen. Rechtsklik op spoor om te draaien.</p>
+                <div id="sporen-toolbar" style="margin-bottom:15px;"></div>
+                
+                <button onclick="vrijgevenDecor()" style="background:#2ecc71; color:white; border:none; padding:10px; width:100%; font-weight:bold; cursor:pointer; border-radius:4px;">🔓 VRIJGEVEN (Blur uit)</button>
+                <button onclick="resetOefening()" style="background:#e74c3c; color:white; border:none; padding:8px; width:100%; margin-top:8px; cursor:pointer; border-radius:4px; font-size:11px;">⚠️ RESET SIMULATIE</button>
+            </div>
+        </div>
+
+        <div id="sidebar">
+            <div id="livefeed"></div>
+            <div id="input-area">
+                <textarea id="msgInput" rows="4" placeholder="Typ je melding volgens protocol..."></textarea>
+                <button class="btn" onclick="sendMsg()">MELDING VERSTUREN</button>
+            </div>
+        </div>
     </div>
 
 <script type="module">
-    // ... Firebase configuratie blijft gelijk ...
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js";
+    import { getDatabase, ref, onValue, set, push, update, serverTimestamp, remove } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-database.js";
 
-    // De sporenlijst is nu geanonimiseerd
+    // DATABASE CONFIGURATIE
+    const firebaseConfig = {
+        apiKey: "AIzaSyB12mTMBnuxdC4W4htyFO_C7Dnh3maVKew",
+        authDomain: "decoroefening.firebaseapp.com",
+        databaseURL: "https://decoroefening-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "decoroefening",
+        storageBucket: "decoroefening.firebasestorage.app"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    let myName, myRole, mijnAanzicht = "";
+    const feedbackBeep = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+
+    // SPORENLIJST: Hier kun je namen en verboden woorden aanpassen
     const sporenLijst = [
-        { id: 'pistool', name: 'Spoor A', img: '9mm pistol top down.png', size: 110, forbidden: ['pistool', 'wapen', 'revolver'] },
-        { id: 'huls', name: 'Spoor B', img: 'Bullet casing isolated.png', size: 35, forbidden: ['huls', 'patroon'] },
-        { id: 'bloed', name: 'Spoor C', img: 'Blood splatter top view.png', size: 160, forbidden: ['bloed', 'bloedvlek', 'bloedspoor'] },
-        { id: 'schoen', name: 'Spoor D', img: 'Shoe print texture.png', size: 90, forbidden: ['schoen', 'afdruk', 'voetafdruk'] }
+        { id: 'A', name: 'Spoor A', img: '9mm pistol top down.png', size: 110 },
+        { id: 'B', name: 'Spoor B', img: 'Bullet casing isolated.png', size: 30 },
+        { id: 'C', name: 'Spoor C', img: 'Blood splatter top view.png', size: 160 },
+        { id: 'D', name: 'Spoor D', img: 'Shoe print texture.png', size: 90 }
     ];
 
-    window.sendMsg = () => {
-        const input = document.getElementById('msgInput');
-        const msg = input.value.trim().toLowerCase();
+    window.startApp = (role) => {
+        const inputNaam = document.getElementById('userName').value.trim();
+        if(!inputNaam) return alert("Voer een naam of eenheidnummer in.");
         
-        // 1. Check op waarnemingswerkwoorden
-        const verbodenWerkwoorden = /\b(zie|ziet|zag|kijk|kijkt|bekijk|bekijkt)\b/gi;
-        if(verbodenWerkwoorden.test(msg)) {
-            return alert("⚠️ PROTOCOL FOUT: Geen waarnemingswerkwoorden gebruiken.");
+        myName = inputNaam;
+        myRole = role;
+        
+        document.getElementById('page-login').classList.remove('active');
+        document.getElementById('page-sim').classList.add('active');
+
+        const container = document.getElementById('foto-container');
+
+        if(role === 'OC') {
+            container.style.backgroundImage = "url('noord.jpg')"; 
+            document.getElementById('oc-panel').style.display = 'block';
+            setupOCToolbar();
+        } else {
+            const fotos = ['noord.jpg', 'oost.jpg', 'zuid.jpg', 'west.jpg'];
+            mijnAanzicht = fotos[Math.floor(Math.random() * fotos.length)];
+            container.style.backgroundImage = `url('${mijnAanzicht}')`;
+            container.classList.add('unit-view-locked');
         }
 
-        // 2. Check op conclusies (verboden namen van sporen)
-        const alleVerbodenWoorden = sporenLijst.flatMap(s => s.forbidden);
-        for(let woord of alleVerbodenWoorden) {
-            if(msg.includes(woord)) {
-                return alert("⚠️ PROTOCOL FOUT: Trek geen conclusies. Beschrijf alleen het uiterlijk van het voorwerp (bijv. 'een metalen voorwerp' ipv '" + woord + "').");
+        listenToSporen();
+        listenToFeed();
+        listenToDecorStatus();
+    };
+
+    function setupOCToolbar() {
+        const tb = document.getElementById('sporen-toolbar');
+        sporenLijst.forEach(s => {
+            const b = document.createElement('button');
+            b.className = 'spoor-btn';
+            b.innerText = s.name;
+            b.onclick = () => set(ref(db, 'positions/' + s.id), { x: 50, y: 50, r: 0 });
+            tb.appendChild(b);
+        });
+    }
+
+    // FEED LOGICA & PROTOCOL CHECK
+    window.sendMsg = () => {
+        const input = document.getElementById('msgInput');
+        const textRaw = input.value.trim();
+        const textLower = textRaw.toLowerCase();
+
+        if(!textLower.startsWith("ik stond")) {
+            return alert("⚠️ PROTOCOLFOUT: De melding moet beginnen met 'Ik stond...'");
+        }
+
+        // VERBODEN WOORDEN FILTER: Hier kun je zelf woorden toevoegen
+        const verboden = ['zie','zag','ziet','kijk','bekijk','pistool','bloed','huls','wapen','mes'];
+        for(let woord of verboden) {
+            if(textLower.includes(woord)) {
+                return alert("⚠️ PROTOCOLFOUT: Gebruik geen namen van sporen of waarnemingswoorden ('" + woord + "').");
             }
         }
 
-        // 3. Check op startzin
-        if(!msg.startsWith("ik stond")) {
-            return alert("⚠️ PROTOCOL FOUT: Begin met je positie ('Ik stond...')");
-        }
-
-        if(msg) {
+        if(textRaw) {
             push(ref(db, 'feed'), { 
-                sender: myName, msg: input.value, role: myRole, 
+                sender: myName, 
+                msg: textRaw, 
+                role: myRole, 
                 view: mijnAanzicht ? mijnAanzicht.replace('.jpg', '').toUpperCase() : "OC",
                 timestamp: serverTimestamp() 
             });
@@ -57,5 +216,115 @@
         }
     };
 
-    // ... De rest van de functies (listenToSporen, etc.) blijven zoals in v4.0 ...
+    window.replyFeedback = (user) => {
+        const fb = prompt(`Feedback voor ${user}:`);
+        if(fb) {
+            push(ref(db, 'feed'), { sender: `OC FEEDBACK (@${user})`, msg: fb, role: 'FEEDBACK', timestamp: serverTimestamp() });
+        }
+    }
+
+    function listenToFeed() {
+        onValue(ref(db, 'feed'), (snapshot) => {
+            const feed = document.getElementById('livefeed');
+            feed.innerHTML = '';
+            let msgs = [];
+            snapshot.forEach(child => msgs.push(child.val()));
+            
+            msgs.reverse().forEach(m => {
+                const isFeedback = m.role === 'FEEDBACK';
+                if(isFeedback && myRole === 'UNIT') feedbackBeep.play();
+                
+                const classCol = isFeedback ? 'melding-fb' : (m.role === 'OC' ? 'melding-oc' : '');
+                feed.innerHTML += `
+                    <div class="melding ${classCol}">
+                        <span class="view-tag">${m.view || ''}</span>
+                        <strong>${m.sender}</strong>
+                        ${m.msg}
+                        ${myRole === 'OC' && !isFeedback ? `<br><span class="feedback-link" onclick="replyFeedback('${m.sender}')">Reageer met feedback</span>` : ''}
+                    </div>`;
+            });
+        });
+    }
+
+    // SPORINGS LOGICA
+    function listenToSporen() {
+        onValue(ref(db, 'positions'), (snapshot) => {
+            const data = snapshot.val() || {};
+            onValue(ref(db, 'decorVrij'), (dv) => {
+                const isVrij = dv.val();
+                
+                // Canvas opschonen
+                document.querySelectorAll('.spoor').forEach(el => {
+                    if(!data[el.id.replace('spoor-', '')]) el.remove();
+                });
+
+                sporenLijst.forEach(s => {
+                    const pos = data[s.id];
+                    if(pos) {
+                        let el = document.getElementById('spoor-' + s.id);
+                        if(!el) {
+                            el = document.createElement('div');
+                            el.id = 'spoor-' + s.id;
+                            el.className = 'spoor';
+                            el.innerHTML = `<img src="${s.img}" style="width:${s.size}px"><div class="spoor-label">${s.name}</div>`;
+                            document.getElementById('canvas').appendChild(el);
+                            if(myRole === 'OC') setupDrag(el, s.id);
+                        }
+                        el.style.left = pos.x + '%';
+                        el.style.top = pos.y + '%';
+                        el.querySelector('img').style.transform = `rotate(${pos.r || 0}deg)`;
+                        el.style.display = (myRole === 'OC' || isVrij) ? 'flex' : 'none';
+                    }
+                });
+            }, {onlyOnce: true});
+        });
+    }
+
+    function setupDrag(el, id) {
+        el.onmousedown = (e) => {
+            if(e.button === 2) { 
+                onValue(ref(db, 'positions/' + id), (snap) => {
+                    update(ref(db, 'positions/' + id), { r: (snap.val().r + 45) % 360 });
+                }, { onlyOnce: true });
+                return;
+            }
+            const move = (ev) => {
+                const rect = document.getElementById('canvas').getBoundingClientRect();
+                update(ref(db, 'positions/' + id), { 
+                    x: Math.max(0, Math.min(100, ((ev.clientX - rect.left) / rect.width) * 100)),
+                    y: Math.max(0, Math.min(100, ((ev.clientY - rect.top) / rect.height) * 100))
+                });
+            };
+            document.onmousemove = move;
+            document.onmouseup = () => document.onmousemove = null;
+        };
+        el.oncontextmenu = (e) => e.preventDefault();
+    }
+
+    // STATUS BEHEER
+    function listenToDecorStatus() {
+        onValue(ref(db, 'decorVrij'), (snap) => {
+            const c = document.getElementById('foto-container');
+            if(snap.val() === true) {
+                c.classList.remove('unit-view-locked');
+            } else if(myRole === 'UNIT') {
+                c.classList.add('unit-view-locked');
+            }
+        });
+    }
+
+    window.vrijgevenDecor = () => {
+        set(ref(db, 'decorVrij'), true);
+        alert("Decor vrijgegeven: Blur is verwijderd en sporen zijn zichtbaar.");
+    };
+
+    window.resetOefening = () => {
+        if(confirm("Weet je zeker dat je alle sporen en de feed wilt wissen?")) {
+            remove(ref(db, 'positions'));
+            remove(ref(db, 'feed'));
+            set(ref(db, 'decorVrij'), false);
+        }
+    };
 </script>
+</body>
+</html>
