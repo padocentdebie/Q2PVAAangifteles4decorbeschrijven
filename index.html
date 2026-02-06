@@ -12,7 +12,8 @@
 
         /* Login */
         #page-login { justify-content: center; align-items: center; background: #001a33; }
-        .briefing-card { background: white; padding: 40px; border-radius: 2px; width: 90%; max-width: 600px; border-top: 8px solid var(--police-blue); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .briefing-card { background: white; padding: 35px; border-radius: 2px; width: 90%; max-width: 650px; border-top: 8px solid var(--police-blue); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .opdracht-box { background: #f8f9fa; border-left: 4px solid var(--police-blue); padding: 15px; margin: 20px 0; font-style: italic; font-size: 14px; color: #333; }
 
         /* Simulator Layout */
         #page-sim.active { display: grid; grid-template-columns: 1fr 450px; }
@@ -54,10 +55,23 @@
     <div id="page-login" class="page active">
         <div class="briefing-card">
             <h1 style="color: var(--police-blue); font-size: 24px; margin-top: 0;">Plaats Delict Simulatie</h1>
-            <input type="text" id="userName" placeholder="Naam / Unitnummer" style="width:100%; padding:14px; margin-bottom:12px; border:1px solid #ccc; font-size: 16px; box-sizing: border-box;">
+            <p style="font-size: 15px; line-height: 1.6; color: #444;">
+                Welkom bij de decoroefening. Stel het decor vast volgens de geldende protocollen. 
+                Focus op objectiviteit, tijdsvormen en het verbod op interpretatieve termen.
+            </p>
+            
+            <div class="opdracht-box">
+                <strong>Melding Operationeel Centrum (OC):</strong><br>
+                "Collega's, begeef je naar de Petsteeg 11 te Amersfoort. Er is daar mogelijk sprake van een verdachte situatie. Stel de situatie veilig en start direct met de verslaglegging van het decor."
+            </div>
+
+            <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Kies een rol en voer je roepnummer of naam in:</p>
+            
+            <input type="text" id="userName" placeholder="Naam / Roepnummer" style="width:100%; padding:14px; margin-bottom:12px; border:1px solid #ccc; font-size: 16px; box-sizing: border-box;">
+            
             <div style="display: flex; gap: 10px;">
-                <button onclick="startApp('UNIT')" class="btn-main">START EENHEID</button>
-                <button onclick="startApp('OC')" class="btn-main" style="background:#444; width: 150px;">OC LOGIN</button>
+                <button onclick="startApp('UNIT')" class="btn-main">EERSTE TER PLAATSE (UNIT)</button>
+                <button onclick="startApp('OC')" class="btn-main" style="background:#444; width: 180px;">OC REGIE</button>
             </div>
         </div>
     </div>
@@ -69,7 +83,7 @@
 
         <div id="sidebar">
             <div id="oc-panel" style="display:none;">
-                <span class="checklist-title">PROTOCOLAFNAME</span>
+                <span class="checklist-title">PROTOCOLAFNAME (OC)</span>
                 <div id="checklist-ui">
                     <label class="checklist-item"><input type="checkbox" class="oc-chk" data-label="Startzin"> Startzin "Ik stond..."</label>
                     <label class="checklist-item"><input type="checkbox" class="oc-chk" data-label="Kaal/Teg"> Kaal: Tegenwoordig</label>
@@ -78,7 +92,7 @@
                     <label class="checklist-item"><input type="checkbox" class="oc-chk" data-label="Onderwerp"> Element = Onderwerp</label>
                     <label class="checklist-item"><input type="checkbox" class="oc-chk" data-label="Verboden"> Geen zie/zag/kijk/je</label>
                 </div>
-                <textarea id="ocFeedbackField" rows="2" placeholder="Vrije opmerking..." style="font-size: 11px; margin-top: 8px;"></textarea>
+                <textarea id="ocFeedbackField" rows="2" placeholder="Gerichte feedback..." style="font-size: 11px; margin-top: 8px;"></textarea>
                 <div id="sporen-beheer"></div>
                 <button onclick="resetSim()" class="reset-link">Sessie resetten</button>
             </div>
@@ -110,7 +124,7 @@
 
     window.startApp = (role) => {
         const n = document.getElementById('userName').value.trim();
-        if(!n) return alert("Voer een naam in.");
+        if(!n) return alert("Voer een naam/nummer in.");
         myName = n; myRole = role;
         document.getElementById('page-login').classList.remove('active');
         document.getElementById('page-sim').classList.add('active');
@@ -136,7 +150,7 @@
     window.stuurFeedback = (targetName) => {
         let report = Array.from(document.querySelectorAll('.oc-chk')).map(c => (c.checked ? "✅" : "❌") + " " + c.getAttribute('data-label')).join(" | ");
         const fbText = document.getElementById('ocFeedbackField').value.trim();
-        push(ref(db, 'feed'), { sender: "MELDKAMER", target: targetName, msg: report + (fbText ? "\nOpmerking: " + fbText : ""), role: 'OC-FEEDBACK' });
+        push(ref(db, 'feed'), { sender: "OC", target: targetName, msg: report + (fbText ? "\nFeedback: " + fbText : ""), role: 'OC-FEEDBACK' });
         document.getElementById('ocFeedbackField').value = '';
     };
 
@@ -162,7 +176,7 @@
                     if(myRole === 'OC' && m.role === 'UNIT') {
                         const b1 = document.createElement('button'); b1.className='btn-inline feedback-trigger-btn'; b1.innerText='📝 Beoordeel ' + m.sender;
                         b1.onclick = () => stuurFeedback(m.sender);
-                        const b2 = document.createElement('button'); b2.className='btn-inline vrijgave-btn'; b2.innerText='🔓 Ontblur ' + m.sender;
+                        const b2 = document.createElement('button'); b2.className='btn-inline vrijgave-btn'; b2.innerText='🔓 Vrijgeven ' + m.sender;
                         b2.onclick = () => vrijgevenVoorUnit(m.sender);
                         div.appendChild(b1); div.appendChild(b2);
                     }
@@ -204,7 +218,7 @@
         div.oncontextmenu = (e) => { e.preventDefault(); update(ref(db, 'sporen/' + id), { r: (currentRot + 45) % 360 }); };
     }
 
-    window.resetSim = () => { if(confirm("Volledige reset?")) { remove(ref(db, 'sporen')); remove(ref(db, 'feed')); remove(ref(db, 'vrijgave')); location.reload(); }};
+    window.resetSim = () => { if(confirm("Sessie wissen voor een nieuw team?")) { remove(ref(db, 'sporen')); remove(ref(db, 'feed')); remove(ref(db, 'vrijgave')); location.reload(); }};
 </script>
 </body>
 </html>
