@@ -20,18 +20,20 @@
         .unit-view-locked { filter: blur(25px) brightness(0.7); }
         #canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         
-        /* Feed & Sidebar */
+        /* Sidebar & Interactie Kolom */
         #sidebar { background: white; border-left: 1px solid #ddd; display: flex; flex-direction: column; height: 100vh; }
+        #oc-panel { padding: 15px; border-bottom: 2px solid #ddd; background: #eee; }
         #livefeed { flex-grow: 1; overflow-y: auto; padding: 15px; background: #fdfdfd; }
-        .melding { border-bottom: 2px solid #eee; padding: 15px; font-size: 14px; margin-bottom: 10px; animation: fadeIn 0.3s; }
+        
+        .melding { border-bottom: 2px solid #eee; padding: 15px; font-size: 14px; margin-bottom: 10px; }
         .melding-unit { border-left: 5px solid var(--police-blue); }
         .melding-fb { background: #fffde7; border-left: 5px solid var(--gold); font-weight: 500; }
         
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* OC Regie Paneel */
-        #oc-controls { position: absolute; top: 10px; left: 10px; background: rgba(255, 255, 255, 0.96); padding: 12px; border: 1px solid #333; z-index: 1000; width: 280px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+        /* Checklist in Rechterkolom */
+        .checklist-title { font-size: 11px; font-weight: bold; letter-spacing: 1px; color: var(--police-blue); display: block; margin-bottom: 8px; }
         .checklist-item { display: flex; align-items: center; font-size: 11px; margin-bottom: 4px; cursor: pointer; }
+        .checklist-item input { margin-right: 8px; }
+        
         .btn-inline { border: none; padding: 8px; cursor: pointer; font-size: 11px; font-weight: bold; margin-top: 5px; width: 100%; text-transform: uppercase; border-radius: 2px; }
         .vrijgave-btn { background: #27ae60; color: white; margin-bottom: 8px; }
         .feedback-trigger-btn { background: var(--gold); color: black; }
@@ -43,7 +45,8 @@
         textarea { width: 100%; border: 1px solid #ccc; padding: 10px; font-size: 14px; resize: none; box-sizing: border-box; }
         .btn-main { background: var(--police-blue); color: white; border: none; padding: 15px; width: 100%; cursor: pointer; font-weight: bold; text-transform: uppercase; }
         
-        .reset-link { color: #c0392b; font-size: 9px; cursor: pointer; text-decoration: underline; display: block; margin-top: 15px; text-align: center; background: none; border: none; width: 100%; }
+        #sporen-beheer { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 10px; }
+        .reset-link { color: #c0392b; font-size: 9px; cursor: pointer; text-decoration: underline; background: none; border: none; width: 100%; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -51,8 +54,7 @@
     <div id="page-login" class="page active">
         <div class="briefing-card">
             <h1 style="color: var(--police-blue); font-size: 24px; margin-top: 0;">Plaats Delict Simulatie</h1>
-            <p style="font-size: 14px; color: #666; line-height: 1.5;">Voer uw naam of unitnummer in om de oefening te starten. De OC-rol is gereserveerd voor de docent.</p>
-            <input type="text" id="userName" placeholder="Achternaam / Unitnummer" style="width:100%; padding:14px; margin-bottom:12px; border:1px solid #ccc; font-size: 16px; box-sizing: border-box;">
+            <input type="text" id="userName" placeholder="Naam / Unitnummer" style="width:100%; padding:14px; margin-bottom:12px; border:1px solid #ccc; font-size: 16px; box-sizing: border-box;">
             <div style="display: flex; gap: 10px;">
                 <button onclick="startApp('UNIT')" class="btn-main">START EENHEID</button>
                 <button onclick="startApp('OC')" class="btn-main" style="background:#444; width: 150px;">OC LOGIN</button>
@@ -63,8 +65,11 @@
     <div id="page-sim" class="page">
         <div id="foto-container">
             <div id="canvas"></div>
-            <div id="oc-controls" style="display:none;">
-                <strong style="font-size: 11px; letter-spacing: 1px; display: block; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-bottom: 8px;">BEGELEIDING & REGIE</strong>
+        </div>
+
+        <div id="sidebar">
+            <div id="oc-panel" style="display:none;">
+                <span class="checklist-title">PROTOCOLAFNAME</span>
                 <div id="checklist-ui">
                     <label class="checklist-item"><input type="checkbox" class="oc-chk" data-label="Startzin"> Startzin "Ik stond..."</label>
                     <label class="checklist-item"><input type="checkbox" class="oc-chk" data-label="Kaal/Teg"> Kaal: Tegenwoordig</label>
@@ -73,18 +78,15 @@
                     <label class="checklist-item"><input type="checkbox" class="oc-chk" data-label="Onderwerp"> Element = Onderwerp</label>
                     <label class="checklist-item"><input type="checkbox" class="oc-chk" data-label="Verboden"> Geen zie/zag/kijk/je</label>
                 </div>
-                <textarea id="ocFeedbackField" rows="2" placeholder="Specifieke aanwijzing..." style="font-size: 11px; margin-top: 8px;"></textarea>
-                
-                <div id="sporen-knoppen" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 10px; border-top: 1px solid #ccc; padding-top: 10px;"></div>
-                
-                <button onclick="resetSim()" class="reset-link">Volledige reset van oefening</button>
+                <textarea id="ocFeedbackField" rows="2" placeholder="Vrije opmerking..." style="font-size: 11px; margin-top: 8px;"></textarea>
+                <div id="sporen-beheer"></div>
+                <button onclick="resetSim()" class="reset-link">Sessie resetten</button>
             </div>
-        </div>
 
-        <div id="sidebar">
             <div id="livefeed"></div>
+
             <div id="input-area">
-                <textarea id="msgInput" rows="4" placeholder="Typ de melding conform protocol..."></textarea>
+                <textarea id="msgInput" rows="3" placeholder="Typ uw beschrijving hier..."></textarea>
                 <button class="btn-main" onclick="verstuurMelding()">Verstuur Melding</button>
             </div>
         </div>
@@ -108,15 +110,15 @@
 
     window.startApp = (role) => {
         const n = document.getElementById('userName').value.trim();
-        if(!n) return alert("Voer eerst een naam in.");
+        if(!n) return alert("Voer een naam in.");
         myName = n; myRole = role;
         document.getElementById('page-login').classList.remove('active');
         document.getElementById('page-sim').classList.add('active');
         
         if(role === 'OC') {
-            document.getElementById('oc-controls').style.display = 'block';
+            document.getElementById('oc-panel').style.display = 'block';
             document.getElementById('foto-container').style.backgroundImage = "url('oost.jpg')"; 
-            const div = document.getElementById('sporen-knoppen');
+            const div = document.getElementById('sporen-beheer');
             sporenDef.forEach(s => {
                 const b = document.createElement('button'); b.innerText = s.name; b.style.fontSize="9px"; b.style.padding="5px";
                 b.onclick = () => set(ref(db, 'sporen/' + s.id), { x: 50, y: 50, r: 0 });
@@ -134,7 +136,7 @@
     window.stuurFeedback = (targetName) => {
         let report = Array.from(document.querySelectorAll('.oc-chk')).map(c => (c.checked ? "✅" : "❌") + " " + c.getAttribute('data-label')).join(" | ");
         const fbText = document.getElementById('ocFeedbackField').value.trim();
-        push(ref(db, 'feed'), { sender: "MELDKAMER", target: targetName, msg: report + (fbText ? "\nInfo: " + fbText : ""), role: 'OC-FEEDBACK' });
+        push(ref(db, 'feed'), { sender: "MELDKAMER", target: targetName, msg: report + (fbText ? "\nOpmerking: " + fbText : ""), role: 'OC-FEEDBACK' });
         document.getElementById('ocFeedbackField').value = '';
     };
 
@@ -143,10 +145,7 @@
     window.verstuurMelding = () => {
         const input = document.getElementById('msgInput');
         const txt = input.value.trim();
-        const low = txt.toLowerCase();
-        if(!low.startsWith("ik stond")) return alert("Protocolfout: Melding moet starten met 'Ik stond...'");
-        const verboden = ['zie','zag','ziet','kijk','je','pistool','bloed','huls','wapen'];
-        for(let v of verboden) { if(low.includes(v)) return alert("Protocolfout: Het woord '" + v + "' is niet toegestaan."); }
+        if(!txt) return;
         push(ref(db, 'feed'), { sender: myName, msg: txt, role: 'UNIT', view: myView.toUpperCase().replace('.JPG','') });
         input.value = '';
     };
@@ -205,7 +204,7 @@
         div.oncontextmenu = (e) => { e.preventDefault(); update(ref(db, 'sporen/' + id), { r: (currentRot + 45) % 360 }); };
     }
 
-    window.resetSim = () => { if(confirm("Weet u zeker dat u alle meldingen en sporen wilt wissen?")) { remove(ref(db, 'sporen')); remove(ref(db, 'feed')); remove(ref(db, 'vrijgave')); location.reload(); }};
+    window.resetSim = () => { if(confirm("Volledige reset?")) { remove(ref(db, 'sporen')); remove(ref(db, 'feed')); remove(ref(db, 'vrijgave')); location.reload(); }};
 </script>
 </body>
 </html>
