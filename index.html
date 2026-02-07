@@ -229,13 +229,13 @@
         };
         div.oncontextmenu = (e) => { e.preventDefault(); update(ref(db, 'sporen/' + id), { r: (currentRot + 45) % 360 }); };
         
-        div.addEventListener('wheel', (e) => {
+        div.onwheel = (e) => {
             e.preventDefault();
-            const stap = 5; // Kleiner stapje voor preciezer schalen
+            const stap = 10;
             const delta = e.deltaY > 0 ? -stap : stap;
             const newSize = Math.max(10, Math.min(600, (currentSize || 50) + delta));
             update(ref(db, 'sporen/' + id), { s: newSize });
-        }, { passive: false });
+        };
     }
 
     window.resetSim = () => { if(confirm("Volledige reset van alle sporen en meldingen?")) { remove(ref(db, 'sporen')); remove(ref(db, 'feed')); remove(ref(db, 'vrijgave')); location.reload(); }};
