@@ -41,7 +41,7 @@
         .vrijgave-btn { background: #27ae60; color: white; margin-bottom: 4px; }
         .feedback-trigger-btn { background: var(--gold); color: black; border: 1px solid #ccac00; }
 
-        .spoor-item { position: absolute; transform: translate(-50%, -50%); cursor: move; z-index: 10; }
+        .spoor-item { position: absolute; transform: translate(-50%, -50%); cursor: move; z-index: 10; touch-action: none; }
         .spoor-label { background: rgba(0,0,0,0.8); color:#fff; font-size:9px; padding:2px 4px; border-radius: 2px; text-align: center; margin-top: 5px; pointer-events: none; }
 
         #input-area { padding: 15px; border-top: 1px solid #ddd; background: #fff; }
@@ -65,7 +65,7 @@
             <div class="instruction-grid">
                 <div class="inst-box">
                     <h3>WERKWIJZE: EENHEID</h3>
-                    1. <strong>Beschrijf vanuit Blur:</strong> Start met "Ik stond...". Beschrijf het <strong>kaal decor</strong> (onveranderlijke elementen) in de tegenwoordige tijd.<br><br>
+                    1. <strong>Beschrijf vanuit Blur:</strong> Start met "Ik stond...". Beschrijf het <strong>kaal decor</strong> (tegenwoordige tijd).<br><br>
                     2. <strong>Wacht op Vrijgave:</strong> OC beoordeelt je vakmanschap. Pas na akkoord wordt de 'mist' opgetrokken.<br><br>
                     3. <strong>Scherp beeld:</strong> Beschrijf het <strong>veranderlijk decor</strong> in de verleden tijd.
                 </div>
@@ -78,7 +78,7 @@
             </div>
 
             <div class="theorie-footer">
-                <strong>Protocol Reminder:</strong> Kaal Decor = Tegenwoordige tijd | Veranderlijk Decor = Verleden tijd | Geen interpretaties (bloed/wapen), maar feitelijke omschrijvingen (rode vloeistof / zwart voorwerp).
+                <strong>Protocol Reminder:</strong> Kaal Decor = Tegenwoordige tijd | Veranderlijk Decor = Verleden tijd | Maak het object onderwerp van de zin (geen "ik zie").
             </div>
 
             <div style="margin-top: 20px;">
@@ -103,7 +103,7 @@
                     <label class="checklist-item"><input type="checkbox" class="oc-chk" data-label="Startzin"> Startzin "Ik stond..."</label>
                     <label class="checklist-item"><input type="checkbox" class="oc-chk" data-label="Kaal/Teg"> Kaal: Tegenwoordig</label>
                     <label class="checklist-item"><input type="checkbox" class="oc-chk" data-label="Verand/Verl"> Veranderlijk: Verleden</label>
-                    <label class="checklist-item"><input type="checkbox" class="oc-chk" data-label="Geen Zie/Zag"> Geen zie/zag/kijk/je</label>
+                    <label class="checklist-item"><input type="checkbox" class="oc-chk" data-label="Onderwerp van zin"> Element is onderwerp van zin</label>
                 </div>
                 <textarea id="ocFeedbackField" rows="2" placeholder="Specifieke aanwijzing..." style="font-size: 11px; margin-top: 5px;"></textarea>
                 <div id="sporen-beheer"></div>
@@ -127,10 +127,10 @@
     let myName, myRole, myView = "";
 
     const sporenDef = [
-        { id: 'A', name: 'Spoor A', img: '9mm pistol top down.png', s: 100 },
-        { id: 'B', name: 'Spoor B', img: 'Bullet casing isolated.png', s: 30 },
-        { id: 'C', name: 'Spoor C', img: 'Blood splatter top view.png', s: 140 },
-        { id: 'D', name: 'Spoor D', img: 'Shoe print texture.png', s: 80 }
+        { id: 'A', name: 'Spoor A', img: '9mm pistol top down.png', s: 60 },
+        { id: 'B', name: 'Spoor B', img: 'Bullet casing isolated.png', s: 20 },
+        { id: 'C', name: 'Spoor C', img: 'Blood splatter top view.png', s: 80 },
+        { id: 'D', name: 'Spoor D', img: 'Shoe print texture.png', s: 50 }
     ];
 
     window.startApp = (role) => {
@@ -228,11 +228,14 @@
             document.onmouseup = () => document.removeEventListener('mousemove', move);
         };
         div.oncontextmenu = (e) => { e.preventDefault(); update(ref(db, 'sporen/' + id), { r: (currentRot + 45) % 360 }); };
-        div.onwheel = (e) => {
+        
+        div.addEventListener('wheel', (e) => {
             e.preventDefault();
-            const delta = e.deltaY > 0 ? -10 : 10;
-            update(ref(db, 'sporen/' + id), { s: Math.max(20, Math.min(500, currentSize + delta)) });
-        };
+            const stap = 5; // Kleiner stapje voor preciezer schalen
+            const delta = e.deltaY > 0 ? -stap : stap;
+            const newSize = Math.max(10, Math.min(600, (currentSize || 50) + delta));
+            update(ref(db, 'sporen/' + id), { s: newSize });
+        }, { passive: false });
     }
 
     window.resetSim = () => { if(confirm("Volledige reset van alle sporen en meldingen?")) { remove(ref(db, 'sporen')); remove(ref(db, 'feed')); remove(ref(db, 'vrijgave')); location.reload(); }};
